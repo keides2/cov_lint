@@ -1,0 +1,88 @@
+{
+	"name": "lsp-sample",
+	"displayName": "lsp-sample",
+	"description": "Language Server Sample Extension + genie-like",
+	"version": "0.0.1",
+	"author": "{Your name}",
+	"publisher": "{Your_outlook_name}",
+	"license": "SEE LICENSE IN LICENSE",
+	"galleryBanner": {
+		"color": "#FFFFFF",
+		"theme": "light"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Ikuyadeu/vscode-language-server-template"
+	},
+	"bugs": {
+		"url": "https://github.com/Ikuyadeu/vscode-language-server-template/issues"
+	},
+	"engines": {
+		"vscode": "^1.61.0"
+	},
+	"categories": [
+		"Linters",
+		"Formatters"
+	],
+	"activationEvents": [
+		"onLanguage:plaintext",
+		"onLanguage:markdown",
+		"onLanguage:c"
+	],
+	"main": "./client/out/extension",
+	"contributes": {
+		"commands": [
+			{
+				"command": "genie-like.refactoring",
+				"title": "Genie like: リファクタリング"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "genie-like.refactoring",
+					"group": "2_modification",
+					"when": "editorTextFocus"
+				}
+			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "genie-like",
+			"properties": {
+				"genie-like.apiKey": {
+					"type": "string",
+					"default": "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",
+					"description": "keides2 の APIキー"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run webpack",
+		"webpack": "npm run clean && webpack --mode production --config ./client/webpack.config.js && webpack --mode production --config ./server/webpack.config.js",
+		"webpack:dev": "npm run clean && webpack --mode none --config ./client/webpack.config.js && webpack --mode none --config ./server/webpack.config.js",
+		"compile": "tsc -b",
+		"compile:client": "tsc -b ./client/tsconfig.json",
+		"compile:server": "tsc -b ./server/tsconfig.json",
+		"watch": "tsc -b -w",
+		"clean": "rimraf client/out && rimraf server/out",
+		"postinstall": "cd client && npm install && cd ../server && npm install && cd .."
+	},
+	"devDependencies": {
+		"@types/node": "16.11.6",
+		"@typescript-eslint/eslint-plugin": "^5.3.0",
+		"@typescript-eslint/parser": "^5.3.0",
+		"eslint": "^8.1.0",
+		"merge-options": "^3.0.4",
+		"rimraf": "^3.0.2",
+		"ts-loader": "^9.2.6",
+		"typescript": "^4.4.4",
+		"webpack": "^5.61.0",
+		"webpack-cli": "^4.9.1"
+	},
+	"dependencies": {
+		"axios": "^1.5.0",
+		"vscode": "^1.1.37"
+	}
+}

@@ -1,0 +1,11 @@
+このコードは、TypeScriptで書かれたLanguage Serverの実装の一部です。Language Serverは、エディタやIDEと連携して、ソースコードの解析や補完、リファクタリングなどの機能を提供するためのサーバーアプリケーションです。
+
+このコードでは、`connection.onCodeAction`メソッドを使用して、Code Actionを追加しています。Code Actionは、ユーザーが特定の問題を修正するために実行できるアクションです。
+
+まず、`params.context.diagnostics`から生成された警告（diagnostics）のみを対象としています。次に、`params.textDocument.uri`を使用して対象ファイルを取得し、存在しない場合や警告がない場合は処理を終了します。
+
+その後、各警告に対してアクションを生成します。アクションのタイトルは「Fix to lower case」とし、警告範囲のテキストを小文字に変換する編集（TextEdit）を作成します。また、関連するテキストドキュメントの情報や編集パターンを指定して、Code Actionを作成します。
+
+最後に、生成したCode Actionを配列に追加し、それを返します。
+
+このコードは、与えられた警告に対して「Fix to lower case」というアクションを提供するためのものです。
