@@ -52,7 +52,7 @@
 			"properties": {
 				"genie-like.apiKey": {
 					"type": "string",
-					"default": "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",
+					"default": "sk-xxxxxxxxxx",
 					"description": "keides2 の APIキー"
 				}
 			}
