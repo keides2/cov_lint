@@ -1,17 +1,21 @@
 {
-	"name": "client",
-	"displayName": "Sample Client",
-	"description": "Sample client into VS Code.",
+	"name": "covlint",
+	"displayName": "COVLint Client",
+	"description": "COVLint client into VS Code.",
 	"version": "0.0.1",
 	"private": true,
-	"author": "{Your name}",
+	"author": {
+		"name": "keides2",
+		"email": "4m9y2c@bma.biglobe.ne.jp",
+		"url": "https://github.com/keides2/cov_lint"
+	},
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Ikuyadeu/vscode-language-server-template"
+		"url": "https://github.com/keides2/cov_lint"
 	},
 	"bugs": {
-		"url": "https://github.com/Ikuyadeu/vscode-language-server-template/issues"
+		"url": "https://github.com/keides2/cov_lint/issues"
 	},
 	"engines": {
 		"vscode": "^1.61.0"

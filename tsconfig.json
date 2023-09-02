@@ -5,7 +5,10 @@
 		"target": "es6",
 		"outDir": "out",
 		"rootDir": "src",
-		"lib": [ "es2020" ],
+		"lib": [
+			"es2020",
+			"dom"
+		],
 		"sourceMap": true
 	},
 	"include": [
@@ -15,7 +18,11 @@
 		"node_modules"
 	],
 	"references": [
-		{ "path": "./client" },
-		{ "path": "./server" }
+		{
+			"path": "./client"
+		},
+		{
+			"path": "./server"
+		}
 	]
 }

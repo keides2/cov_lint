@@ -1,5 +1,3 @@
-'use strict';
-
 import {
 	CodeAction,
 	CodeActionKind,
@@ -80,17 +78,18 @@ function validate(doc: TextDocument) {
 
 	// 警告を出す範囲（今回は5行目の1文字目から5行目の最終文字目まで）
 	const range: Range = {
-		start: { line:4, character: 0 },
+		start: { line: 4, character: 0 },
 		end: { line: 4, character: Number.MAX_VALUE }
 	};
+
 	// 警告を追加，引数は順番に範囲，メッセージ，警告強度，警告id，警告のソース
 	diagnostics.push(
-		Diagnostic.create(range, 'ここに Coverity の指摘を表示', DiagnosticSeverity.Warning, '123', 'coverity')
+		Diagnostic.create(range, 'ここに Coverity の指摘を表示', DiagnosticSeverity.Warning, '123', 'covlint')
 	);
-	connection.sendDiagnostics({ uri: doc.uri, diagnostics });
+	// connection.sendDiagnostics({ uri: doc.uri, diagnostics });
 
-	/*
 	// ２つ以上並んでいるアルファベット大文字を検出
+	// TODO: Coverity 指摘
 	const text = doc.getText();
 	// 検出するための正規表現 (正規表現テスト: https://regex101.com/r/wXZbr9/1)
 	const pattern = /\b[A-Z]{2,}\b/g;
@@ -114,14 +113,14 @@ function validate(doc: TextDocument) {
 			// 警告コード、警告コードを識別するために使用する
 			code: '',
 			// 警告を発行したソース、例: eslint, typescript
-			source: 'sample',
+			source: 'covlint',
 		};
 		// 警告リストに警告内容を追加
 		diagnostics.push(diagnostic);
 	}
-	//接続に警告を通知する
+
+	// connection に警告を通知する
 	connection.sendDiagnostics({ uri: doc.uri, diagnostics });
-	*/
 
 }
 
@@ -159,7 +158,7 @@ function setupDocumentsListeners() {
 	// Code Actionを追加する
 	connection.onCodeAction((params) => {
 		// sampleから生成した警告のみを対象とする
-		const diagnostics = params.context.diagnostics.filter((diag) => diag.source === 'sample');
+		const diagnostics = params.context.diagnostics.filter((diag) => diag.source === 'covlint');
 
 		connection.console.info(`Code Actions is added`);
 		// 対象ファイルを取得する
@@ -176,9 +175,10 @@ function setupDocumentsListeners() {
 		diagnostics.forEach((diag) => {
 			// アクションのメッセージ
 			const title = 'Fix to lower case';
-			// 警告範囲の文字列取得
+			// 警告範囲のみの文字列取得
 			const originalText = textDocument.getText(diag.range);
 			// 該当箇所を小文字に変更
+			// TODO:Coverity の指摘結果に変更する
 			const edits = [TextEdit.replace(diag.range, originalText.toLowerCase())];
 
 			const textDocumentIdentifier: VersionedTextDocumentIdentifier = {
@@ -198,8 +198,8 @@ function setupDocumentsListeners() {
 			// コードアクションと警告を関連付ける
 			fixAction.diagnostics = [diag];
 			fixAction.isPreferred = true;
-        	// コードアクションのコマンド識別子を設定
-        	fixAction.command = { command: CommandIDs.fix, title: 'Fix to lower case' };
+			// コードアクションのコマンド識別子を設定
+			fixAction.command = { command: CommandIDs.fix, title: 'Fix to lower case' };
 			codeActions.push(fixAction);
 		});
 
@@ -225,6 +225,7 @@ function parseCSV(filePath: string): Promise<Issue[]> {
 				issues.push(issue);
 			})
 			.on('end', () => {
+				// TODO: 読み終わったら issues をグローバル変数に入れる
 				resolve(issues);
 			})
 			.on('error', (error) => {

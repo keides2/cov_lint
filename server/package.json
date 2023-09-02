@@ -1,21 +1,28 @@
 {
-  "name": "sample-server",
+  "name": "covlint",
+  "displayName": "COVLint Server",
+  "description": "Language server COVLint",
   "version": "0.0.1",
-  "author": "{Your name}",
-  "description": "Language server sample",
-  "engines": {
-    "node": "*"
+  "private": true,
+  "author": {
+    "name": "keides2",
+    "email": "4m9y2c@bma.biglobe.ne.jp",
+    "url": "https://github.com/keides2/cov_lint"
   },
   "license": "MIT",
-  "bin": {
-    "sample-server": "./bin/sample-server"
-  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ikuyadeu/vscode-language-server-template"
+    "url": "https://github.com/keides2/cov_lint"
   },
   "bugs": {
-    "url": "https://github.com/Ikuyadeu/vscode-language-server-template/issues"
+    "url": "https://github.com/keides2/cov_lint/issues"
+  },
+  "bin": {
+    "covlint-server": "./bin/covlint-server"
+  },
+  "engines": {
+    "vscode": "^1.61.0",
+    "node": "*"
   },
   "dependencies": {
     "vscode-languageserver": "8.0.0-next.3",

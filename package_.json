@@ -1,11 +1,15 @@
 {
-	"name": "lsp-sample",
-	"displayName": "lsp-sample",
-	"description": "Language Server Sample Extension + genie-like",
+	"name": "covlint",
+	"displayName": "COVLint",
+	"description": "An extension that reads indications from a CSV file and displays them in the source code.",
 	"version": "0.0.1",
-	"author": "{Your name}",
+	"author": {
+		"name": "keides2",
+		"email": "4m9y2c@bma.biglobe.ne.jp",
+		"url": "https://github.com/keides2/cov_lint"
+	},
 	"publisher": "{Your_outlook_name}",
-	"license": "SEE LICENSE IN LICENSE",
+	"license": "MIT",
 	"galleryBanner": {
 		"color": "#FFFFFF",
 		"theme": "light"
@@ -27,20 +31,21 @@
 	"activationEvents": [
 		"onLanguage:plaintext",
 		"onLanguage:markdown",
-		"onLanguage:c"
+		"onLanguage:c",
+		"onCommand:covlint.snapshot"
 	],
 	"main": "./client/out/extension",
 	"contributes": {
 		"commands": [
 			{
-				"command": "genie-like.refactoring",
-				"title": "Genie like: リファクタリング"
+				"command": "covlint.refactoring",
+				"title": "COVLint: リファクタリング"
 			}
 		],
 		"menus": {
 			"editor/context": [
 				{
-					"command": "genie-like.refactoring",
+					"command": "covlint.refactoring",
 					"group": "2_modification",
 					"when": "editorTextFocus"
 				}
@@ -48,9 +53,9 @@
 		},
 		"configuration": {
 			"type": "object",
-			"title": "genie-like",
+			"title": "covlint",
 			"properties": {
-				"genie-like.apiKey": {
+				"covlint.apiKey": {
 					"type": "string",
 					"default": "sk-xxxxxxxxxx",
 					"description": "keides2 の APIキー"
