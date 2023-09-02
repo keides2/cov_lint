@@ -66,6 +66,17 @@
 					"type": "string",
 					"default": "sk-xxxxxxxxxx",
 					"description": "keides2 の APIキー"
+				},
+				"covlint.trace.server": {
+					"scope": "window",
+					"type": "string",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"default": "off",
+					"description": "Traces the communication between VS Code and the language server."
 				}
 			}
 		}
