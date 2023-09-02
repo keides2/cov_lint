@@ -38,8 +38,15 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "covlint.refactoring",
-				"title": "COVLint: リファクタリング"
+				"command": "covlint.snapshot",
+				"title": "COVLint: スナップショットCSVファイルを開きます",
+				"args": [
+					{
+						"name": "snapshotID",
+						"type": "string",
+						"description": "ID of the snapshot"
+					}
+				]
 			}
 		],
 		"menus": {

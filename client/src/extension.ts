@@ -1,9 +1,15 @@
+import * as path from 'path';
+import { TextDecoder } from 'util';
 import {
 	ExtensionContext,
 	window,
 	Uri,
 	commands,
-	workspace
+	workspace,
+	TextEditor,
+	DecorationOptions,
+	Position,
+	Range
 } from 'vscode';
 import {
 	LanguageClient,
@@ -119,7 +125,6 @@ export function activate(context: ExtensionContext): void {
 	});
 
 
-	/*
 	// ドキュメント（CSVファイル）が開かれた時のイベントを登録
 	const onDocumentOpen = workspace.onDidOpenTextDocument(async (document) => {
 		if (document.fileName.endsWith('.c')) {
@@ -156,7 +161,12 @@ export function activate(context: ExtensionContext): void {
 		}
 	});
 
-	
+
+	// 波線のスタイルを定義
+	const wavyLineDecorationType = window.createTextEditorDecorationType({
+		textDecoration: 'underline wavy red'
+	});
+
 	// 編集中のファイルに波線を引く処理
 	function executeUnderlineCommand(activeEditor: TextEditor, activeFileName: string, openedFileStartLine: number, lines: string[]) {
 		const document = activeEditor.document;
@@ -187,17 +197,18 @@ export function activate(context: ExtensionContext): void {
 
 		activeEditor.setDecorations(wavyLineDecorationType, decorationRanges);
 	}
-	*/
+
 
 	// コンテキストにコマンドとイベントを登録
 	// context.subscriptions.push(snapshotCommand, onDocumentOpen);
-	context.subscriptions.push(snapshotCommand);
+	//context.subscriptions.push(snapshotCommand);
 
 	// サーバーのパスを取得
 	const serverModule = Uri.joinPath(context.extensionUri, 'server', 'out', 'server.js').fsPath;
 
 	// デバッグ時の設定
 	const debugOptions = { execArgv: ['--nolazy', '--inspect=6011'], cwd: process.cwd() };
+
 	// サーバーの設定
 	const serverOptions: ServerOptions = {
 		run: {
@@ -230,9 +241,9 @@ export function activate(context: ExtensionContext): void {
 		// LSPを起動
 		client = new LanguageClient(
 			// 拡張機能のID
-			'languageServerId',
+			'CSVLintLSPServerandClient',
 			// ユーザ向けの名前（出力ペインで使用されます）
-			'CSVLint LSP Server',
+			'CSVLint LSP Server and Client',
 			serverOptions,
 			clientOptions
 		);
@@ -245,8 +256,10 @@ export function activate(context: ExtensionContext): void {
 
 	}
 
-	// 拡張機能のコマンドを登録
+	// コンテキストに拡張機能のコマンドとイベントを登録
 	context.subscriptions.push(
+		snapshotCommand,
+		onDocumentOpen,
 		disposable,
 	);
 }
