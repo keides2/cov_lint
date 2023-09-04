@@ -1,5 +1,8 @@
 # COVLint
 
+MS サンプルコード lsp-sample で上書きし、CSVファイルのオープン処理を追加しました
+
+---
 [@Ikuyadeu](https://qiita.com/Ikuyadeu) 氏の記事 [Language Server Protocol開発チュートリアル](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff) 学習ページです
 
 ---

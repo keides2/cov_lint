@@ -1,239 +1,285 @@
+/* --------------------------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * ------------------------------------------------------------------------------------------ */
 import {
-	CodeAction,
-	CodeActionKind,
 	createConnection,
+	TextDocuments,
 	Diagnostic,
 	DiagnosticSeverity,
 	ProposedFeatures,
-	Range,
-	TextDocuments,
-	TextDocumentEdit,
+	InitializeParams,
+	DidChangeConfigurationNotification,
+	CompletionItem,
+	CompletionItemKind,
+	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	TextEdit,
-	VersionedTextDocumentIdentifier
+	RequestHandler,
+	InitializeResult
 } from 'vscode-languageserver/node';
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// コマンド識別子
-namespace CommandIDs {
-	export const fix = 'sample.fix';
-}
-
-// サーバー接続オブジェクトを作成する。この接続にはNodeのIPC(プロセス間通信)を利用する
-// LSPの全機能を提供する
+// Create a connection for the server, using Node's IPC as a transport.
+// Also include all preview / proposed LSP features.
+// ノードの IPC をトランスポートとして使用して、サーバーへの接続を作成します。
+// すべてのプレビュー/提案された LSP 機能も含めます。
 const connection = createConnection(ProposedFeatures.all);
-connection.console.info(`Sample server running in node ${process.version}`);
 
-// 初期化ハンドルでインスタンス化する
-let documents!: TextDocuments<TextDocument>;
+// Create a simple text document manager.
+// 単純なテキスト ドキュメント マネージャーを作成します。
+const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
-// 接続の初期化
-connection.onInitialize((_params, _cancel, progress) => {
-	// サーバーの起動を進捗表示する
-	progress.begin('Initializing Sample Server');
+interface Issue {
+	filename: string;
+	lineNumber: number;
+	message: string;
+}
+let issues: Issue[] = [];
 
-	// テキストドキュメントを監視する
-	documents = new TextDocuments(TextDocument);
-	setupDocumentsListeners();
+const openCSV: RequestHandler<string, void, void> = async (csvFileName) => {
+	const filePath = path.join(__dirname, csvFileName);
+	try {
+		const data = fs.readFileSync(filePath, 'utf-8');
+		const lines = data.split('\n');
+		issues = [];
+		for (const line of lines) {
+			const [filename, lineNumber, issue] = line.split(',');
+			if (filename && lineNumber && issue) {
+				issues.push({ filename, lineNumber: parseInt(lineNumber, 10), message: issue });
+			}
+		}
+	} catch (err) {
+		connection.console.error(`Failed to open CSV file: ${err}`);
+	}
+};
 
-	// 起動進捗表示の終了
-	progress.done();
 
-	return {
-		// サーバー仕様
+let hasConfigurationCapability = false;
+let hasWorkspaceFolderCapability = false;
+let hasDiagnosticRelatedInformationCapability = false;
+
+connection.onInitialize((params: InitializeParams) => {
+	const capabilities = params.capabilities;
+
+	// Does the client support the `workspace/configuration` request?
+	// If not, we fall back using global settings.
+	// クライアントは `workspace/configuration` リクエストをサポートしていますか?
+	// そうでない場合は、グローバル設定を使用してフォールバックします。
+	hasConfigurationCapability = !!(
+		capabilities.workspace && !!capabilities.workspace.configuration
+	);
+	hasWorkspaceFolderCapability = !!(
+		capabilities.workspace && !!capabilities.workspace.workspaceFolders
+	);
+	hasDiagnosticRelatedInformationCapability = !!(
+		capabilities.textDocument &&
+		capabilities.textDocument.publishDiagnostics &&
+		capabilities.textDocument.publishDiagnostics.relatedInformation
+	);
+
+	const result: InitializeResult = {
 		capabilities: {
-			// ドキュメントの同期
-			// ファイルを保存したときや変更，閉じたときに実行
-			textDocumentSync: {
-				openClose: true,
-				change: TextDocumentSyncKind.Incremental,
-				willSaveWaitUntil: false,
-				save: {
-					includeText: false,
-				}
-			},
-			// 自動修正を実装
-			codeActionProvider: {
-				codeActionKinds: [CodeActionKind.QuickFix],
+			textDocumentSync: TextDocumentSyncKind.Incremental,
+			// Tell the client that this server supports code completion.
+			// このサーバーがコード補完をサポートしていることをクライアントに伝えます。
+			completionProvider: {
 				resolveProvider: true
-			},
-			executeCommandProvider: {
-				commands: [CommandIDs.fix],
-			},
-		},
+			}
+		}
 	};
+	if (hasWorkspaceFolderCapability) {
+		result.capabilities.workspace = {
+			workspaceFolders: {
+				supported: true
+			}
+		};
+	}
+
+	connection.onRequest('covlint/openCSV', openCSV);
+
+	return result;
 });
 
-/**
- * テキストドキュメントを検証する
- * @param doc 検証対象ドキュメント
- *
- * ソースコードの5行目に対して警告を表示する
- */
-function validate(doc: TextDocument) {
-	// 警告などの状態を管理するリスト
-	const diagnostics: Diagnostic[] = [];
+connection.onInitialized(() => {
+	if (hasConfigurationCapability) {
+		// Register for all configuration changes.
+		// すべての設定変更を登録します。
+		connection.client.register(DidChangeConfigurationNotification.type, undefined);
+	}
+	if (hasWorkspaceFolderCapability) {
+		connection.workspace.onDidChangeWorkspaceFolders(_event => {
+			connection.console.log('Workspace folder change event received.');
+		});
+	}
+});
 
-	// 警告を出す範囲（今回は5行目の1文字目から5行目の最終文字目まで）
-	const range: Range = {
-		start: { line: 4, character: 0 },
-		end: { line: 4, character: Number.MAX_VALUE }
-	};
+// The example settings
+interface ExampleSettings {
+	maxNumberOfProblems: number;
+}
 
-	// 警告を追加，引数は順番に範囲，メッセージ，警告強度，警告id，警告のソース
-	diagnostics.push(
-		Diagnostic.create(range, 'ここに Coverity の指摘を表示', DiagnosticSeverity.Warning, '123', 'covlint')
-	);
-	// connection.sendDiagnostics({ uri: doc.uri, diagnostics });
+// The global settings, used when the `workspace/configuration` request is not supported by the client.
+// Please note that this is not the case when using this server with the client provided in this example
+// but could happen with other clients.
+// グローバル設定。「workspace/configuration」リクエストがクライアントでサポートされていない場合に使用されます。
+// これは、この例で提供されているクライアントでこのサーバーを使用する場合には当てはまりませんが、
+// 他のクライアントでは発生する可能性があることに注意してください。
+const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
+let globalSettings: ExampleSettings = defaultSettings;
 
-	// ２つ以上並んでいるアルファベット大文字を検出
-	// TODO: Coverity 指摘
-	const text = doc.getText();
-	// 検出するための正規表現 (正規表現テスト: https://regex101.com/r/wXZbr9/1)
+// Cache the settings of all open documents
+// 開いているすべてのドキュメントの設定をキャッシュします
+const documentSettings: Map<string, Thenable<ExampleSettings>> = new Map();
+
+connection.onDidChangeConfiguration(change => {
+	if (hasConfigurationCapability) {
+		// Reset all cached document settings
+		documentSettings.clear();
+	} else {
+		globalSettings = <ExampleSettings>(
+			(change.settings.languageServerExample || defaultSettings)
+		);
+	}
+
+	// Revalidate all open text documents
+	// 開いているすべてのテキストドキュメントを再検証します
+	documents.all().forEach(validateTextDocument);
+});
+
+function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
+	if (!hasConfigurationCapability) {
+		return Promise.resolve(globalSettings);
+	}
+	let result = documentSettings.get(resource);
+	if (!result) {
+		result = connection.workspace.getConfiguration({
+			scopeUri: resource,
+			section: 'languageServerExample'
+		});
+		documentSettings.set(resource, result);
+	}
+	return result;
+}
+
+// Only keep settings for open documents
+// 開いているドキュメントの設定のみを保持します
+documents.onDidClose(e => {
+	documentSettings.delete(e.document.uri);
+});
+
+// The content of a text document has changed. This event is emitted
+// when the text document first opened or when its content has changed.
+// テキストドキュメントの内容が変更されました。 
+// このイベントは、テキスト ドキュメントが最初に開かれたとき、またはそのコンテンツが変更されたときに発生します。
+documents.onDidChangeContent(change => {
+	validateTextDocument(change.document);
+});
+
+async function validateTextDocument(textDocument: TextDocument): Promise<void> {
+	// In this simple example we get the settings for every validate run.
+	// この簡単な例では、検証を実行するたびに設定を取得します。
+	const settings = await getDocumentSettings(textDocument.uri);
+
+	// The validator creates diagnostics for all uppercase words length 2 and more
+	// バリデータは、長さ 2 以降のすべての大文字の単語の診断を作成します
+	const text = textDocument.getText();
 	const pattern = /\b[A-Z]{2,}\b/g;
 	let m: RegExpExecArray | null;
 
-	// 正規表現にマッチした文字列すべてを対象にする
-	while ((m = pattern.exec(text)) !== null) {
-		// 対象の位置から正規表現にマッチした文字までを対象にする
-		const range: Range = {
-			start: doc.positionAt(m.index),
-			end: doc.positionAt(m.index + m[0].length),
-		};
-		// 警告を追加する;
+	let problems = 0;
+	const diagnostics: Diagnostic[] = [];
+	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+		problems++;
 		const diagnostic: Diagnostic = {
-			// 警告範囲
-			range: range,
-			// 警告メッセージ
-			message: `${m[0]} is all UPPERCASE.`,
-			// 警告の重要度、Error, Warning, Information, Hintのいずれかを選ぶ
 			severity: DiagnosticSeverity.Warning,
-			// 警告コード、警告コードを識別するために使用する
-			code: '',
-			// 警告を発行したソース、例: eslint, typescript
-			source: 'covlint',
+			range: {
+				start: textDocument.positionAt(m.index),
+				end: textDocument.positionAt(m.index + m[0].length)
+			},
+			message: `${m[0]} is all uppercase.`,
+			source: 'ex'
 		};
-		// 警告リストに警告内容を追加
+		if (hasDiagnosticRelatedInformationCapability) {
+			diagnostic.relatedInformation = [
+				{
+					location: {
+						uri: textDocument.uri,
+						range: Object.assign({}, diagnostic.range)
+					},
+					message: 'Spelling matters'
+				},
+				{
+					location: {
+						uri: textDocument.uri,
+						range: Object.assign({}, diagnostic.range)
+					},
+					message: 'Particularly for names'
+				}
+			];
+		}
 		diagnostics.push(diagnostic);
 	}
 
-	// connection に警告を通知する
-	connection.sendDiagnostics({ uri: doc.uri, diagnostics });
-
+	// Send the computed diagnostics to VSCode.
+	// 計算された診断を VSCode に送信します。
+	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
 
+connection.onDidChangeWatchedFiles(_change => {
+	// Monitored files have change in VSCode
+	// VSCode で監視対象のファイルが変更されました
+	connection.console.log('We received an file change event');
+});
 
-/**
- * ドキュメントの動作を監視する
- */
-function setupDocumentsListeners() {
-	// ドキュメントを作成、変更、閉じる作業を監視するマネージャー
-	documents.listen(connection);
+// This handler provides the initial list of the completion items.
+// このハンドラーは、完了項目の初期リストを提供します。
+connection.onCompletion(
+	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+		// The pass parameter contains the position of the text document in
+		// which code complete got requested. For the example we ignore this
+		// info and always provide the same completion items.
+		// pass パラメータには、コードコンプリートが要求されたテキスト ドキュメントの位置が含まれます。
+		// この例では、この情報を無視し、常に同じ完了項目を提供します。
+		return [
+			{
+				label: 'TypeScript',
+				kind: CompletionItemKind.Text,
+				data: 1
+			},
+			{
+				label: 'JavaScript',
+				kind: CompletionItemKind.Text,
+				data: 2
+			}
+		];
+	}
+);
 
-	// 開いた時
-	documents.onDidOpen((event) => {
-		validate(event.document);
-	});
-
-	// 変更した時
-	documents.onDidChangeContent((change) => {
-		validate(change.document);
-	});
-
-	// 保存した時
-	documents.onDidSave((change) => {
-		validate(change.document);
-	});
-
-	// 閉じた時
-	documents.onDidClose((close) => {
-		// ドキュメントのURI(ファイルパス)を取得する
-		const uri = close.document.uri;
-		// 警告を削除する
-		connection.sendDiagnostics({ uri: uri, diagnostics: [] });
-	});
-
-	// Code Actionを追加する
-	connection.onCodeAction((params) => {
-		// sampleから生成した警告のみを対象とする
-		const diagnostics = params.context.diagnostics.filter((diag) => diag.source === 'covlint');
-
-		connection.console.info(`Code Actions is added`);
-		// 対象ファイルを取得する
-		const textDocument = documents.get(params.textDocument.uri);
-
-		// 対象ファイルが存在しない場合は終了する
-		if (textDocument === undefined || diagnostics.length === 0) {
-			return [];
+// This handler resolves additional information for the item selected in
+// the completion list.
+// このハンドラーは、完了リストで選択された項目の追加情報を解決します。
+connection.onCompletionResolve(
+	(item: CompletionItem): CompletionItem => {
+		if (item.data === 1) {
+			item.detail = 'TypeScript details';
+			item.documentation = 'TypeScript documentation';
+		} else if (item.data === 2) {
+			item.detail = 'JavaScript details';
+			item.documentation = 'JavaScript documentation';
 		}
+		return item;
+	}
+);
 
-		const codeActions: CodeAction[] = [];
-
-		// 各警告に対してアクションを生成する
-		diagnostics.forEach((diag) => {
-			// アクションのメッセージ
-			const title = 'Fix to lower case';
-			// 警告範囲のみの文字列取得
-			const originalText = textDocument.getText(diag.range);
-			// 該当箇所を小文字に変更
-			// TODO:Coverity の指摘結果に変更する
-			const edits = [TextEdit.replace(diag.range, originalText.toLowerCase())];
-
-			const textDocumentIdentifier: VersionedTextDocumentIdentifier = {
-				uri: textDocument.uri,
-				version: textDocument.version
-			};
-			const editPattern = {
-				documentChanges: [
-					TextDocumentEdit.create(textDocumentIdentifier, edits)
-				]
-			};
-			// コードアクションを生成
-			const fixAction = CodeAction.create(
-				title,
-				editPattern,
-				CodeActionKind.QuickFix);
-			// コードアクションと警告を関連付ける
-			fixAction.diagnostics = [diag];
-			fixAction.isPreferred = true;
-			// コードアクションのコマンド識別子を設定
-			fixAction.command = { command: CommandIDs.fix, title: 'Fix to lower case' };
-			codeActions.push(fixAction);
-		});
-
-		return codeActions;
-	});
-}
-
-
-/*
-// CSVファイルのパース
-function parseCSV(filePath: string): Promise<Issue[]> {
-	return new Promise((resolve, reject) => {
-		const issues: Issue[] = [];
-
-		fs.createReadStream(filePath)
-			.pipe(csvParser())
-			.on('data', (row) => {
-				const issue: Issue = {
-					fileName: row['ファイル名'],
-					lineNumber: parseInt(row['行番号']),
-					description: row['指摘内容'],
-				};
-				issues.push(issue);
-			})
-			.on('end', () => {
-				// TODO: 読み終わったら issues をグローバル変数に入れる
-				resolve(issues);
-			})
-			.on('error', (error) => {
-				reject(error);
-			});
-	});
-}
-*/
+// Make the text document manager listen on the connection
+// for open, change and close text document events
+// テキスト ドキュメント マネージャーが、
+// 接続でテキスト ドキュメントのオープン、変更、クローズ イベントをリッスンするようにします。
+documents.listen(connection);
 
 // Listen on the connection
 connection.listen();

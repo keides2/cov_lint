@@ -1,29 +1,22 @@
 {
-	"name": "covlint",
-	"displayName": "COVLint Client",
-	"description": "COVLint client into VS Code.",
-	"version": "0.0.1",
-	"private": true,
-	"author": {
-		"name": "keides2",
-		"email": "4m9y2c@bma.biglobe.ne.jp",
-		"url": "https://github.com/keides2/cov_lint"
-	},
+	"name": "covlint-client",
+	"description": "VSCode part of a language server",
+	"author": "keides2",
 	"license": "MIT",
+	"version": "0.0.1",
+	"publisher": "vscode",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/keides2/cov_lint"
 	},
-	"bugs": {
-		"url": "https://github.com/keides2/cov_lint/issues"
-	},
 	"engines": {
-		"vscode": "^1.61.0"
-	},
-	"devDependencies": {
-		"@types/vscode": "1.61.0"
+		"vscode": "^1.75.0"
 	},
 	"dependencies": {
-		"vscode-languageclient": "8.0.0-next.4"
+		"vscode-languageclient": "^8.1.0"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.75.1",
+		"@vscode/test-electron": "^2.2.3"
 	}
 }
