@@ -4,18 +4,19 @@
  * ------------------------------------------------------------------------------------------ */
 import {
 	createConnection,
-	TextDocuments,
 	Diagnostic,
 	DiagnosticSeverity,
 	ProposedFeatures,
 	InitializeParams,
+	InitializeResult,
 	DidChangeConfigurationNotification,
 	CompletionItem,
 	CompletionItemKind,
+	TextDocuments,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
 	RequestHandler,
-	InitializeResult
+	RequestType,
 } from 'vscode-languageserver/node';
 import {
 	TextDocument
@@ -27,11 +28,18 @@ import * as path from 'path';
 // Also include all preview / proposed LSP features.
 // ノードの IPC をトランスポートとして使用して、サーバーへの接続を作成します。
 // すべてのプレビュー/提案された LSP 機能も含めます。
+// サーバー接続オブジェクトを作成する。この接続にはNodeのIPC(プロセス間通信)を利用する
+// LSPの全機能を提供する
 const connection = createConnection(ProposedFeatures.all);
+connection.console.info(`covlint server running in node ${process.version}`);
 
 // Create a simple text document manager.
 // 単純なテキスト ドキュメント マネージャーを作成します。
+// 初期化ハンドルでインスタンス化する
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+
+// クライアントから受け取るCSVファイル名
+const openCSVRequest = new RequestType<string, void, void>('covlint/openCSV');
 
 interface Issue {
 	filename: string;
@@ -41,7 +49,12 @@ interface Issue {
 let issues: Issue[] = [];
 
 const openCSV: RequestHandler<string, void, void> = async (csvFileName) => {
-	const filePath = path.join(__dirname, csvFileName);
+	// const filePath = path.join(__dirname, csvFileName);
+	const path = require('path');
+	const projectPath = path.resolve(__dirname, '../..');	// server.ts から2つ上=ルート
+	connection.console.log(projectPath);
+
+	const filePath = path.join(projectPath, csvFileName);
 	try {
 		const data = fs.readFileSync(filePath, 'utf-8');
 		const lines = data.split('\n');
@@ -55,6 +68,8 @@ const openCSV: RequestHandler<string, void, void> = async (csvFileName) => {
 	} catch (err) {
 		connection.console.error(`Failed to open CSV file: ${err}`);
 	}
+
+	// TODO: 
 };
 
 
@@ -62,13 +77,13 @@ let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
 
+// 接続の初期化
 connection.onInitialize((params: InitializeParams) => {
-	const capabilities = params.capabilities;
-
 	// Does the client support the `workspace/configuration` request?
 	// If not, we fall back using global settings.
 	// クライアントは `workspace/configuration` リクエストをサポートしていますか?
 	// そうでない場合は、グローバル設定を使用してフォールバックします。
+	const capabilities = params.capabilities;
 	hasConfigurationCapability = !!(
 		capabilities.workspace && !!capabilities.workspace.configuration
 	);
@@ -99,22 +114,25 @@ connection.onInitialize((params: InitializeParams) => {
 		};
 	}
 
-	connection.onRequest('covlint/openCSV', openCSV);
-
 	return result;
 });
 
+// 接続の初期化後
 connection.onInitialized(() => {
 	if (hasConfigurationCapability) {
 		// Register for all configuration changes.
 		// すべての設定変更を登録します。
-		connection.client.register(DidChangeConfigurationNotification.type, undefined);
+		void connection.client.register(DidChangeConfigurationNotification.type, undefined);
 	}
 	if (hasWorkspaceFolderCapability) {
 		connection.workspace.onDidChangeWorkspaceFolders(_event => {
 			connection.console.log('Workspace folder change event received.');
 		});
 	}
+
+	// connection.onRequest('covlint/openCSV', openCSV);
+	connection.onRequest(openCSVRequest, openCSV);
+
 });
 
 // The example settings
@@ -176,7 +194,7 @@ documents.onDidClose(e => {
 // テキストドキュメントの内容が変更されました。 
 // このイベントは、テキスト ドキュメントが最初に開かれたとき、またはそのコンテンツが変更されたときに発生します。
 documents.onDidChangeContent(change => {
-	validateTextDocument(change.document);
+	void validateTextDocument(change.document);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
@@ -226,7 +244,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
 	// Send the computed diagnostics to VSCode.
 	// 計算された診断を VSCode に送信します。
-	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+	void connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
 
 connection.onDidChangeWatchedFiles(_change => {
