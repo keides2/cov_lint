@@ -1,22 +1,18 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 import {
 	createConnection,
-	Diagnostic,
-	DiagnosticSeverity,
-	ProposedFeatures,
-	InitializeParams,
-	InitializeResult,
-	DidChangeConfigurationNotification,
 	CompletionItem,
 	CompletionItemKind,
+	Diagnostic,
+	DiagnosticSeverity,
+	DidChangeConfigurationNotification,
+	InitializeParams,
+	InitializeResult,
+	ProposedFeatures,
+	RequestHandler,
+	RequestType,
 	TextDocuments,
 	TextDocumentPositionParams,
 	TextDocumentSyncKind,
-	RequestHandler,
-	RequestType,
 } from 'vscode-languageserver/node';
 import {
 	TextDocument
@@ -65,6 +61,16 @@ const openCSV: RequestHandler<string, void, void> = async (csvFileName) => {
 				issues.push({ filename, lineNumber: parseInt(lineNumber, 10), message: issue });
 			}
 		}
+		// TODO: データを処理するロジックを追加する
+		connection.console.log('取得したデータ: ${issues}');
+
+		for (let i = 0; i < issues.length; i++) {
+			const issue = issues[i];
+			for (let j = 0; j < issue.lineNumber; j++) {
+				connection.console.log(issue.filename);
+			}
+		}
+
 	} catch (err) {
 		connection.console.error(`Failed to open CSV file: ${err}`);
 	}
@@ -79,6 +85,35 @@ let hasDiagnosticRelatedInformationCapability = false;
 
 // 接続の初期化
 connection.onInitialize((params: InitializeParams) => {
+	// クライアントから画面情報を受け取る
+	connection.onRequest('custom/analyzeCode', async ({ fileName, visibleRanges }) => {
+		// ここでfileNameとvisibleRangesを受け取る
+		console.log('Received fileName:', fileName);
+		console.log('Received visibleRanges:', visibleRanges);
+
+		// openCSV関数からcsvDataを取得
+		for (const issue of issues) {
+			if (issue.filename === fileName) {
+				for (const range of visibleRanges) {
+					if (range.start.line <= issue.lineNumber && issue.lineNumber <= range.end.line) {
+						// 該当行に波線を引く
+						const diagnostic: Diagnostic = {
+							severity: DiagnosticSeverity.Warning,
+							range: {
+								start: { line: issue.lineNumber, character: 0 },
+								end: { line: issue.lineNumber, character: Number.MAX_VALUE },
+							},
+							message: issue.message,
+							source: 'csv-lint'
+						};
+
+						connection.sendDiagnostics({ uri: fileName, diagnostics: [diagnostic] });
+					}
+				}
+			}
+		};
+	}
+
 	// Does the client support the `workspace/configuration` request?
 	// If not, we fall back using global settings.
 	// クライアントは `workspace/configuration` リクエストをサポートしていますか?
