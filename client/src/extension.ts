@@ -54,7 +54,8 @@ export function activate(context: ExtensionContext) {
 		// プレーンテキストドキュメント用のサーバーを登録します
 		// 対象とするファイルの種類や拡張子
 		documentSelector: [
-			{ scheme: 'file', language: 'plaintext' },
+			// { scheme: 'file', language: 'plaintext' },
+			{ scheme: 'file' },
 			{ scheme: 'untitled' }
 		],
 		// 警告パネルでの表示名

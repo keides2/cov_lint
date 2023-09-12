@@ -48,7 +48,7 @@
 		"commands": [
 			{
 				"command": "covlint.activate",
-				"title": "Activate COVLint: open CSV file"
+				"title": "COVLint: open CSV file"
 			}
 		]
 	},

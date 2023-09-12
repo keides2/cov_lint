@@ -38,9 +38,38 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 const openCSVRequest = new RequestType<string, void, void>('covlint/openCSV');
 
 interface Issue {
+	cid: number;
 	filename: string;
+	// language: string;
+	// functionDisplayName: string;
 	lineNumber: number;
-	message: string;
+	// impact: string;						// 影響度
+	// type: string;						// 問題の種類
+	// type2: string;
+	// category: string;					// カテゴリ
+	// category2: string;					// カテゴリ2
+	eventDescription: string;
+	// CWE: string;
+	// count: number;						// カウント
+	// checker: string;					// チェッカー
+	// status: string;						// 状態
+	// first_detect: string;				// 初回検出日
+	// comparison: string;					// 比較
+	// firstSnapshotId: string;			// 最初のスナップショットID
+	// firstSnapshot_date: string;			// 最初のスナップショットの日付
+	// firstSnapshotStream: string;		// 最初のスナップショットのストリーム
+	// lastSnapshotId: string;				// 最後のスナップショット
+	// lastSnapshotDate: string;			// 最後のスナップショットの日付
+	// lastSnapshotStream: string;			// 最後のスナップショットのストリーム
+	// lastTriagedDate: string;			// 最終選別日
+	// lastTriagedUser: string;			// 最終選別ユーザー
+	// lastTriagedComment: string;			// 最終選別コメント
+	// classification: string;				// 分類
+	// importance: string;					// 重要度
+	// action: string;
+	// external_reference: string;			// 外部参照
+	// owner: string;						// 所有者/担当者
+	// mergeKey: string;					// マージキー
 }
 let issues: Issue[] = [];
 
@@ -56,26 +85,31 @@ const openCSV: RequestHandler<string, void, void> = async (csvFileName) => {
 		const lines = data.split('\n');
 		issues = [];
 		for (const line of lines) {
-			const [filename, lineNumber, issue] = line.split(',');
-			if (filename && lineNumber && issue) {
-				issues.push({ filename, lineNumber: parseInt(lineNumber, 10), message: issue });
-			}
+			const columns = line.split(',');
+			const issue: Issue = {
+				cid: parseInt(columns[0]),
+				filename: columns[1] ? columns[1].substring(columns[1].lastIndexOf('/') + 1) : '',
+				lineNumber: parseInt(columns[5]),
+				eventDescription: columns[12],
+				// ... 他のプロパティも同様に設定 ...
+			};
+			issues.push(issue);
 		}
-		// TODO: データを処理するロジックを追加する
-		connection.console.log('取得したデータ: ${issues}');
 
-		for (let i = 0; i < issues.length; i++) {
-			const issue = issues[i];
-			for (let j = 0; j < issue.lineNumber; j++) {
-				connection.console.log(issue.filename);
-			}
-		}
+		// TODO: データを処理するロジックを追加する
+		connection.console.log(`取得したデータ: ${issues}`);
+
+		// for (let i = 0; i < issues.length; i++) {
+		// 	const issue = issues[i];
+		// 	for (let j = 0; j < issue.lineNumber; j++) {
+		// 		connection.console.log(issue.filename);
+		// 	}
+		// }
 
 	} catch (err) {
 		connection.console.error(`Failed to open CSV file: ${err}`);
 	}
 
-	// TODO: 
 };
 
 
@@ -88,8 +122,8 @@ connection.onInitialize((params: InitializeParams) => {
 	// クライアントから画面情報を受け取る
 	connection.onRequest('custom/analyzeCode', async ({ fileName, visibleRanges }) => {
 		// ここでfileNameとvisibleRangesを受け取る
-		console.log('Received fileName:', fileName);
-		console.log('Received visibleRanges:', visibleRanges);
+		connection.console.log('Received fileName:' + fileName);
+		connection.console.log('Received visibleRanges:' + visibleRanges);
 
 		// openCSV関数からcsvDataを取得
 		for (const issue of issues) {
@@ -103,16 +137,16 @@ connection.onInitialize((params: InitializeParams) => {
 								start: { line: issue.lineNumber, character: 0 },
 								end: { line: issue.lineNumber, character: Number.MAX_VALUE },
 							},
-							message: issue.message,
+							message: issue.eventDescription,
 							source: 'csv-lint'
 						};
 
-						connection.sendDiagnostics({ uri: fileName, diagnostics: [diagnostic] });
+						await connection.sendDiagnostics({ uri: fileName, diagnostics: [diagnostic] });
 					}
 				}
 			}
-		};
-	}
+		}
+	});
 
 	// Does the client support the `workspace/configuration` request?
 	// If not, we fall back using global settings.
@@ -141,6 +175,7 @@ connection.onInitialize((params: InitializeParams) => {
 			}
 		}
 	};
+
 	if (hasWorkspaceFolderCapability) {
 		result.capabilities.workspace = {
 			workspaceFolders: {
@@ -201,6 +236,7 @@ connection.onDidChangeConfiguration(change => {
 	// Revalidate all open text documents
 	// 開いているすべてのテキストドキュメントを再検証します
 	documents.all().forEach(validateTextDocument);
+
 });
 
 function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
@@ -228,13 +264,14 @@ documents.onDidClose(e => {
 // when the text document first opened or when its content has changed.
 // テキストドキュメントの内容が変更されました。 
 // このイベントは、テキスト ドキュメントが最初に開かれたとき、またはそのコンテンツが変更されたときに発生します。
-documents.onDidChangeContent(change => {
-	void validateTextDocument(change.document);
+documents.onDidChangeContent(async change => {
+	await validateTextDocument(change.document);
 });
 
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// In this simple example we get the settings for every validate run.
 	// この簡単な例では、検証を実行するたびに設定を取得します。
+	// const settings = getDocumentSettings(textDocument.uri);
 	const settings = await getDocumentSettings(textDocument.uri);
 
 	// The validator creates diagnostics for all uppercase words length 2 and more
@@ -245,7 +282,8 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
 	let problems = 0;
 	const diagnostics: Diagnostic[] = [];
-	while ((m = pattern.exec(text)) && problems < settings.maxNumberOfProblems) {
+	const resolvedSettings = await settings;
+	while ((m = pattern.exec(text)) && problems < resolvedSettings.maxNumberOfProblems) {
 		problems++;
 		const diagnostic: Diagnostic = {
 			severity: DiagnosticSeverity.Warning,
@@ -277,10 +315,29 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 		diagnostics.push(diagnostic);
 	}
 
+	// CSVから取得したissuesの情報を使用して診断を作成
+	for (const issue of issues) {
+		if (textDocument.uri.endsWith(issue.filename)) {
+			const diagnostic: Diagnostic = {
+				severity: DiagnosticSeverity.Warning,
+				range: {
+					start: { line: issue.lineNumber - 1, character: 0 },
+					end: { line: issue.lineNumber - 1, character: Number.MAX_VALUE }
+				},
+				message: issue.eventDescription,
+				source: 'csv-lint'
+			};
+			diagnostics.push(diagnostic);
+		}
+	}
+
 	// Send the computed diagnostics to VSCode.
 	// 計算された診断を VSCode に送信します。
-	void connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+	await connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+	// return diagnostics;
+
 }
+
 
 connection.onDidChangeWatchedFiles(_change => {
 	// Monitored files have change in VSCode
