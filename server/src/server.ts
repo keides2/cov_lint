@@ -310,6 +310,35 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
 	// Send the computed diagnostics to VSCode.
 	// 計算された診断を VSCode に送信します。
+	// await connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+
+
+	// openCSV関数からcsvDataを取得
+	const lines = text.split('\n');		// 行数
+
+	for (const issue of issues) {
+		// TODO: ひとまずパスを除いた拡張子を含むファイル名どうしの比較
+		if (path.basename(issue.filename) === path.basename(textDocument.uri)) {
+			for (let i = 0; i < lines.length; i++) {
+				// 行番号が一致したら
+				if (i + 1 === issue.lineNumber) {
+					// 該当行に波線を引く
+					const diagnostic: Diagnostic = {
+						severity: DiagnosticSeverity.Warning,
+						range: {
+							// start: { line: issue.lineNumber - 1, character: 0 },
+							start: { line: i, character: 0 },
+							end: { line: i, character: Number.MAX_VALUE },
+						},
+						message: issue.eventDescription,
+						source: 'csv-lint'
+					};
+					diagnostics.push(diagnostic);
+
+				}
+			}
+		}
+	}
 	await connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 
 }
@@ -329,7 +358,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	return result;
 }
 
-
+/*
 // クライアントから画面情報を受け取る
 connection.onRequest('custom/analyzeCode', async ({ fileName, visibleRanges }) => {
 	// ここでfileNameとvisibleRangesを受け取る
@@ -362,7 +391,7 @@ connection.onRequest('custom/analyzeCode', async ({ fileName, visibleRanges }) =
 		}
 	}
 });
-
+*/
 
 
 // ファイルの変更を監視する

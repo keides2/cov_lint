@@ -101,6 +101,7 @@ export function activate(context: ExtensionContext) {
 
 	}
 
+	/*
 	// 画面情報をサーバーに送る
 	window.onDidChangeActiveTextEditor(async (editor) => {
 		if (editor) {
@@ -114,7 +115,7 @@ export function activate(context: ExtensionContext) {
 			void client.sendRequest('custom/analyzeCode', { fileName, visibleRanges });
 		}
 	});
-
+	*/
 
 	// Start the client. This will also launch the server
 	void client.start().catch((error) => client.error(`Starting the server failed.`, error, 'force'));
