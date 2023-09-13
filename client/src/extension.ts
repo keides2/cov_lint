@@ -75,7 +75,7 @@ export function activate(context: ExtensionContext) {
 	const disposable = commands.registerCommand('covlint.activate', async () => {
 		const csvFileName = await window.showInputBox({
 			prompt: 'Enter the CSV file name',
-			placeHolder: '1001.csv'
+			placeHolder: 'dsiot_region_equipment_linkage.csv'
 		});
 		if (!csvFileName) {
 			void window.showWarningMessage('No CSV file name provided. Exiting.');
@@ -107,6 +107,8 @@ export function activate(context: ExtensionContext) {
 			const doc = editor.document;
 			const fileName = doc.fileName;
 			const visibleRanges = editor.visibleRanges;
+
+			console.log(`Sending visibleRanges[0]: ${visibleRanges}`);
 
 			// Send this information to the server
 			void client.sendRequest('custom/analyzeCode', { fileName, visibleRanges });
