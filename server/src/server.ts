@@ -38,6 +38,9 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 // クライアントから受け取るCSVファイル名
 const openCSVRequest = new RequestType<string, void, void>('covlint/openCSV');
 
+// CSVファイルは、cov_snap が取得する snapshot_id_14295.csv 書式
+// cov_auto 書式の CSV
+/*
 interface Issue {
 	cid: number;
 	filename: string;
@@ -72,38 +75,74 @@ interface Issue {
 	// owner: string;						// 所有者/担当者
 	// mergeKey: string;					// マージキー
 }
+*/
+// cov_snap 書式の CSV
+interface Issue {
+	cid: string;					// CID A列[0]
+	filename: string;				// ファイル名 B列[1]
+	// functionname: string;		// 関数名 C列[2]
+	lineNumber: string;				// 行番号 D列[3]
+	// impact: string;				// 影響度 E列[4]
+	// typeOfProblem: string;		// 問題の種類 F列[5]
+	type: string;					// 型 G列[6]
+	checker: string;				// チェッカー名 H列[7]
+	// domain: string;				// ドメイン I列[8]
+	// stream: string;				// ストリーム名 J列[9]
+	mainEvent: string;				// メインイベントの説明 K列[10]
+	eventTag: string;				// イベントタグ L列[11]
+	// category: string;			// カテゴリ M列[12]
+	// localEffect: string;			// ローカル効果 N列[13]
+	// description: string;			// 説明 O列[14]
+	// firstDetect: string;			// 初回の検出日 P列[15]
+	// firstSnapshotId: string;		// 初回のスナップショットID Q列[16]
+	// firstStream: string;			// 初回のストリーム R列[17]
+	// flstDetect: string;			// 直近の検出日 S列[18]
+	// lastSnapshotId: string;		// 直近のスナップショットID T列[19]
+	// lastStream: string;			// 直近のストリーム U列[20]
+}
 let issues: Issue[] = [];
 
-const openCSV: RequestHandler<string, void, void> = async (csvFileName) => {
-	// const filePath = path.join(__dirname, csvFileName);
+const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
+	// csvFilePath をフルパスで入力
+	// const filePath = path.join(__dirname, csvFilePath);
 	// const path = require('path');
-	const projectPath = path.resolve(__dirname, '../..');	// server.ts から2つ上=ルート
-	connection.console.log(projectPath);
+	// const projectPath = path.resolve(__dirname, '../..');	// server.ts から2つ上=ルート
+	// const filePath = path.join(projectPath, csvFilePath);
+	connection.console.log(csvFilePath);
 
-	const filePath = path.join(projectPath, csvFileName);
 	try {
-		const data = fs.readFileSync(filePath);
+		const data = fs.readFileSync(csvFilePath);
 		const decodedData = iconv.decode(data, 'SHIFT_JIS');
 		const lines = decodedData.split('\n');
 		// 全指摘を issue に格納する
 		issues = [];
 		for (const line of lines) {
-			const columns = line.split(',');
+			// const columns = line.split(',');
+			const columns = line.split(',').map(column => column.replace(/"/g, ''));	// ダブルクォーテーション削除
 			const issue: Issue = {
-				cid: parseInt(columns[0]),
+				// cid: parseInt(columns[0]),
+				cid: columns[0],
 				filename: columns[1] ? columns[1].substring(columns[1].lastIndexOf('/') + 1) : '',
-				lineNumber: parseInt(columns[5]),
-				eventDescription: columns[12],
+				// lineNumber: parseInt(columns[3]),
+				lineNumber: columns[3],
+				type: columns[6],
+				checker: columns[7],
+				eventTag: columns[11],
+				mainEvent: columns[10],
 				// ... 他のプロパティも同様に設定 ...
 			};
 			issues.push(issue);
 		}
 
 		for (let i = 0; i < 5; i++) {	// max: issues.length
-			connection.console.log(`取得したデータ cid: ${issues[i].cid}`);
-			connection.console.log(`取得したデータ filename: ${issues[i].filename}`);
-			connection.console.log(`取得したデータ lineNumber: ${issues[i].lineNumber}`);
-			connection.console.log(`取得したデータ eventDescription: ${issues[i].eventDescription}`);
+			connection.console.log(`取得したデータ:`);
+			connection.console.log(`  cid: ${issues[i].cid}`);
+			connection.console.log(`  filename: ${issues[i].filename}`);
+			connection.console.log(`  lineNumber: ${issues[i].lineNumber}`);
+			connection.console.log(`  type: ${issues[i].type}`);
+			connection.console.log(`  checker: ${issues[i].checker}`);
+			connection.console.log(`  eventTag: ${issues[i].eventTag}`);
+			connection.console.log(`  mainEvent: ${issues[i].mainEvent}`);
 
 		}
 
@@ -120,40 +159,6 @@ let hasDiagnosticRelatedInformationCapability = false;
 
 // 接続の初期化
 connection.onInitialize((params: InitializeParams) => {
-	/*
-	// クライアントから画面情報を受け取る
-	connection.onRequest('custom/analyzeCode', async ({ fileName, visibleRanges }) => {
-		// ここでfileNameとvisibleRangesを受け取る
-		connection.console.log('onInitialize - onRequest: Received fileName:' + fileName);
-		connection.console.log('onInitialize - onRequest: Received visibleRanges (start):' + visibleRanges.start);
-		connection.console.log('onInitialize - onRequest: Received visibleRanges (end):' + visibleRanges.end);
-
-		// openCSV関数からcsvDataを取得
-		for (const issue of issues) {
-			// TODO: ひとまずパスを除いた拡張子を含むファイル名どうしの比較
-			if (path.basename(issue.filename) === path.basename(fileName)) {
-				for (const range of visibleRanges) {
-					if (range.start.line <= issue.lineNumber && issue.lineNumber <= range.end.line) {
-						// 該当行に波線を引く
-						const diagnostic: Diagnostic = {
-							severity: DiagnosticSeverity.Warning,
-							range: {
-								start: { line: issue.lineNumber, character: 0 },
-								end: { line: issue.lineNumber, character: Number.MAX_VALUE },
-							},
-							message: issue.eventDescription,
-							source: 'csv-lint'
-						};
-
-						await connection.sendDiagnostics({ uri: fileName, diagnostics: [diagnostic] });
-					}
-				}
-			}
-		}
-		
-	});
-	*/
-
 	// Does the client support the `workspace/configuration` request?
 	// If not, we fall back using global settings.
 	// クライアントは `workspace/configuration` リクエストをサポートしていますか?
@@ -321,8 +326,9 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 		if (path.basename(issue.filename) === path.basename(textDocument.uri)) {
 			for (let i = 0; i < lines.length; i++) {
 				// 行番号が一致したら
-				if (i + 1 === issue.lineNumber) {
+				if (i + 1 === parseInt(issue.lineNumber)) {
 					// 該当行に波線を引く
+					let content = 'CID: ' + issue.cid + ': ' + issue.type + ' (' + issue.checker + ')\n' + issue.eventTag + ': ' + issue.mainEvent;
 					const diagnostic: Diagnostic = {
 						severity: DiagnosticSeverity.Warning,
 						range: {
@@ -330,8 +336,8 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 							start: { line: i, character: 0 },
 							end: { line: i, character: Number.MAX_VALUE },
 						},
-						message: issue.eventDescription,
-						source: 'csv-lint'
+						message: content,
+						source: 'covlint'
 					};
 					diagnostics.push(diagnostic);
 
@@ -357,41 +363,6 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	}
 	return result;
 }
-
-/*
-// クライアントから画面情報を受け取る
-connection.onRequest('custom/analyzeCode', async ({ fileName, visibleRanges }) => {
-	// ここでfileNameとvisibleRangesを受け取る
-	connection.console.log('onRequest: Received fileName:' + fileName);
-	connection.console.log('onRequest: Received visibleRanges[0]]:' + visibleRanges[0]);
-	connection.console.log('onRequest: Received visibleRanges[1]]:' + visibleRanges[1]);
-
-	// openCSV関数からcsvDataを取得
-	for (const issue of issues) {
-		// TODO: ひとまずパスを除いた拡張子を含むファイル名どうしの比較
-		if (path.basename(issue.filename) === path.basename(fileName)) {
-			for (const range of visibleRanges) {
-				connection.console.log(`Received visibleRanges: ${range}`);
-
-				if (range.line <= issue.lineNumber && issue.lineNumber <= range.line) {
-					// 該当行に波線を引く
-					const diagnostic: Diagnostic = {
-						severity: DiagnosticSeverity.Warning,
-						range: {
-							start: { line: issue.lineNumber, character: 0 },
-							end: { line: issue.lineNumber, character: Number.MAX_VALUE },
-						},
-						message: issue.eventDescription,
-						source: 'csv-lint'
-					};
-
-					await connection.sendDiagnostics({ uri: fileName, diagnostics: [diagnostic] });
-				}
-			}
-		}
-	}
-});
-*/
 
 
 // ファイルの変更を監視する

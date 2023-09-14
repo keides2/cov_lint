@@ -75,10 +75,10 @@ export function activate(context: ExtensionContext) {
 	const disposable = commands.registerCommand('covlint.activate', async () => {
 		const csvFileName = await window.showInputBox({
 			prompt: 'Enter the CSV file name',
-			placeHolder: 'dsiot_region_equipment_linkage.csv'
+			placeHolder: 'fullpath/to/snapshot_id_xxxxx.csv'
 		});
 		if (!csvFileName) {
-			void window.showWarningMessage('No CSV file name provided. Exiting.');
+			await window.showWarningMessage('No CSV file name provided. Exiting.');
 			return;
 		}
 
@@ -100,22 +100,6 @@ export function activate(context: ExtensionContext) {
 		return;
 
 	}
-
-	/*
-	// 画面情報をサーバーに送る
-	window.onDidChangeActiveTextEditor(async (editor) => {
-		if (editor) {
-			const doc = editor.document;
-			const fileName = doc.fileName;
-			const visibleRanges = editor.visibleRanges;
-
-			console.log(`Sending visibleRanges[0]: ${visibleRanges}`);
-
-			// Send this information to the server
-			void client.sendRequest('custom/analyzeCode', { fileName, visibleRanges });
-		}
-	});
-	*/
 
 	// Start the client. This will also launch the server
 	void client.start().catch((error) => client.error(`Starting the server failed.`, error, 'force'));
