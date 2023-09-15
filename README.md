@@ -9,7 +9,7 @@
   ![issue_VSC](./img/issue_VSC.jpg)
 
 - COVLint ソースコード画面（指摘を複数表示）
-  ![issue_vSC_3cids](./img/issue_vSC_3cids.jpg)
+  ![issue_vSC_3cids](./img/issue_VSC_3cids.jpg)
 
 `COVLint`は、`Coverity`が解析したソースコードの指摘結果を `Visual Studio Code` に表示します。
 指摘結果は、スクリプト`cov_snap`が取得したCSVファイルから読み込みます。
