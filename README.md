@@ -30,6 +30,8 @@
 
 - インストール完了です
   ![vsix_installed](./img/vsix_installed.jpg)
+
+- 拡張機能 `COVLint`
   ![covlint_extension](./img/covlint_extension.jpg)
 
 ### 2. CSVファイルの読み込み
