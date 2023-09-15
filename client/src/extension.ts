@@ -5,7 +5,6 @@ import {
 	workspace,
 	ExtensionContext
 } from 'vscode';
-
 import {
 	LanguageClient,
 	LanguageClientOptions,
@@ -14,6 +13,7 @@ import {
 	TransportKind,
 	RequestType
 } from 'vscode-languageclient/node';
+import * as fs from 'fs';
 
 let client: LanguageClient;
 const openCSVRequest = new RequestType<string, void, void>('covlint/openCSV');
@@ -73,16 +73,26 @@ export function activate(context: ExtensionContext) {
 
 	// コマンドパレットコマンドの登録
 	const disposable = commands.registerCommand('covlint.activate', async () => {
-		const csvFileName = await window.showInputBox({
+		const csvFilePath = await window.showInputBox({
 			prompt: 'Enter the CSV file name',
 			placeHolder: 'fullpath/to/snapshot_id_xxxxx.csv'
 		});
-		if (!csvFileName) {
+
+		if (!csvFilePath) {
 			await window.showWarningMessage('No CSV file name provided. Exiting.');
 			return;
+
 		}
 
-		void client.sendRequest(openCSVRequest, csvFileName);
+		if (!fs.existsSync(csvFilePath)) {
+			void window.showInformationMessage(`File does not exist. Try again.: ${csvFilePath}`);
+
+		} else {
+			void window.showInformationMessage(`File opened: ${csvFilePath}`);
+
+		}
+
+		void client.sendRequest(openCSVRequest, csvFilePath);
 	});
 	context.subscriptions.push(disposable);
 

@@ -25,4 +25,4 @@ server/out/package.json
 !server/out/eslintServer.js
 
 # docs
-docs
+docs/*

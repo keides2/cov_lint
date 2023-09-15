@@ -104,11 +104,17 @@ let issues: Issue[] = [];
 
 const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 	// csvFilePath をフルパスで入力
-	// const filePath = path.join(__dirname, csvFilePath);
-	// const path = require('path');
-	// const projectPath = path.resolve(__dirname, '../..');	// server.ts から2つ上=ルート
-	// const filePath = path.join(projectPath, csvFilePath);
 	connection.console.log(csvFilePath);
+
+	/* サーバーの起動に失敗する -> クライアント側
+	if (!fs.existsSync(csvFilePath)) {
+		void window.showInformationMessage(`File does not exist. Try again.: ${csvFilePath}`);
+
+	} else {
+		void window.showInformationMessage(`File opened: ${csvFilePath}`);
+
+	}
+	*/
 
 	try {
 		const data = fs.readFileSync(csvFilePath);
