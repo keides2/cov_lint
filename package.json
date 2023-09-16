@@ -5,7 +5,7 @@
 	"author": "keides2",
 	"publisher": "keides2",
 	"license": "MIT",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/keides2/cov_lint"

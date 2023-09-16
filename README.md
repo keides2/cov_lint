@@ -25,7 +25,7 @@
 - 3点メニューから「VSIXからインストール」を選択します
   ![install_from_vsix](./img/install_from_vsix.jpg)
 
-- ファイル「covlint-0.0.1.vsix」をインストールします
+- ファイル「covlint-0.0.2.vsix」をインストールします
   ![vsix_dialog](./img/vsix_dialog.jpg)
 
 - インストール完了です
@@ -85,4 +85,5 @@ Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp
 ![Usage](./usage.gif)
 
 ---
-2023/09/15 嶋谷 初版
+2023/09/15 keides2 v0.0.1
+2023/09/16 keides2 v0.0.2
