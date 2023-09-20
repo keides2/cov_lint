@@ -5,7 +5,7 @@
 	"author": "keides2",
 	"publisher": "keides2",
 	"license": "MIT",
-	"version": "0.0.3",
+	"version": "0.1.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/keides2/cov_lint"
@@ -77,10 +77,14 @@
 		"@typescript-eslint/parser": "^5.54.0",
 		"eslint": "^8.35.0",
 		"mocha": "^9.2.1",
-		"typescript": "^5.1.3"
+		"typescript": "^5.1.3",
+		"webpack": "^5.88.2",
+		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
 		"@vscode/test-electron": "^2.3.4",
-		"encoding": "^0.1.13"
+		"encoding": "^0.1.13",
+		"merge-options": "^3.0.4",
+		"ts-loader": "^9.4.4"
 	}
 }

@@ -26,3 +26,7 @@ server/out/package.json
 
 # docs
 docs/*
+
+# ChatGPT advice
+**/node_modules/**
+**/src/**

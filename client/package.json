@@ -2,7 +2,7 @@
 	"name": "covlint-client",
 	"description": "COVLint client",
 	"license": "MIT",
-	"version": "0.0.3",
+	"version": "0.1.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/keides2/cov_lint"
@@ -11,6 +11,7 @@
 		"vscode": "^1.75.0"
 	},
 	"dependencies": {
+		"merge-options": "^3.0.4",
 		"vscode-languageclient": "^8.1.0"
 	},
 	"devDependencies": {
