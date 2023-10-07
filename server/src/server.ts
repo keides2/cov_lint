@@ -278,9 +278,12 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// const settings = getDocumentSettings(textDocument.uri);
 	const settings = await getDocumentSettings(textDocument.uri);
 
+	const text = textDocument.getText();
+	const diagnostics: Diagnostic[] = [];
+
+	/* 大文字診断をやめる
 	// The validator creates diagnostics for all uppercase words length 2 and more
 	// バリデータは、長さ 2 以降のすべての大文字の単語の診断を作成します
-	const text = textDocument.getText();
 	const pattern = /\b[A-Z]{2,}\b/g;
 	let m: RegExpExecArray | null;
 
@@ -322,7 +325,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	// Send the computed diagnostics to VSCode.
 	// 計算された診断を VSCode に送信します。
 	// await connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-
+	*/
 
 	// openCSV関数からcsvDataを取得
 	const lines = text.split('\n');		// 行数

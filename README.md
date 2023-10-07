@@ -82,15 +82,7 @@ Load the snapshot CSV file obtained with `cov_snap`.
 
 ## Notes
 
-This was based on Microsoft's `https://github.com/Microsoft/vscode-extension-samples` `lsp-sample` and an article by [@Ikuyadeu](https://qiita.com/Ikuyadeu) titled [Language Server Protocol Development Tutorial](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff). Therefore, the following features remain:
-
-- Code verification function
-  - Detects uppercase letters of three or more characters
-- Code correction function
-  - Corrects the warning location to lowercase
-
-The image below is from the `vscode-language-server-template Linter` README.
-![Usage](./usage.gif)
+This was based on Microsoft's `https://github.com/Microsoft/vscode-extension-samples` `lsp-sample` and an article by [@Ikuyadeu](https://qiita.com/Ikuyadeu) titled [Language Server Protocol Development Tutorial](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff). 
 
 ---
 
@@ -98,6 +90,7 @@ The image below is from the `vscode-language-server-template Linter` README.
 - 2023/09/16 keides2 v0.0.2 Image replacement
 - 2023/09/17 keides2 v0.0.3 Extension Marketplace support
 - 2023/09/20 keides2 v0.1.0 webpack
+- 2023/10/07 keides2 V0.2.0 Removed the uppercase character detection function for 3 or more characters.
   
 ---
 # COVLint (in Japanese)
@@ -187,16 +180,8 @@ The image below is from the `vscode-language-server-template Linter` README.
 
 ## 備考
 
-Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp-sample`や、[@Ikuyadeu](https://qiita.com/Ikuyadeu) 氏の記事 [Language Server Protocol開発チュートリアル](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff) をベースにしましたので次の機能が残っています。
+Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp-sample`や、[@Ikuyadeu](https://qiita.com/Ikuyadeu) 氏の記事 [Language Server Protocol開発チュートリアル](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff) を参考にしました。
 
-- コード検証機能
-  - ３文字以上の大文字を検出します
-- コード修正機能
-  - 警告箇所を小文字に修正します
-
-下図は`vscode-language-server-template Linter` README から。
-
-![Usage](./usage.gif)
 
 ---
 
@@ -204,4 +189,5 @@ Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp
 - 2023/09/16 keides2 v0.0.2 図の差し替え
 - 2023/09/17 keides2 v0.0.3 拡張機能マーケットプレース対応
 - 2023/09/20 keides2 v0.1.0 webpack 対応。英文追加
+- 2023/10/07 keides2 V0.2.0 ３文字以上の大文字検出をやめる
   
