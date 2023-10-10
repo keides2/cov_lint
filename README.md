@@ -91,7 +91,8 @@ This was based on Microsoft's `https://github.com/Microsoft/vscode-extension-sam
 - 2023/09/17 keides2 v0.0.3 Extension Marketplace support
 - 2023/09/20 keides2 v0.1.0 webpack
 - 2023/10/07 keides2 V0.2.0 Removed the uppercase character detection function for 3 or more characters.
-  
+- 2023/10/10 keides2 v0.3.0 The color of the wavy line, the level of the diagnosis result, and the icon change depending on the impact level: "high," "medium," and "low."
+
 ---
 # COVLint (in Japanese)
 
@@ -189,5 +190,6 @@ Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp
 - 2023/09/16 keides2 v0.0.2 図の差し替え
 - 2023/09/17 keides2 v0.0.3 拡張機能マーケットプレース対応
 - 2023/09/20 keides2 v0.1.0 webpack 対応。英文追加
-- 2023/10/07 keides2 V0.2.0 ３文字以上の大文字検出をやめる
+- 2023/10/07 keides2 v0.2.0 ３文字以上の大文字検出をやめる
+- 2023/10/10 keides2 v0.3.0 影響度「高」、「中」、「低」に対応し、波線の色と診断結果のレベルとアイコンを変える
   

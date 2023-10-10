@@ -82,7 +82,7 @@ interface Issue {
 	filename: string;				// ファイル名 B列[1]
 	// functionname: string;		// 関数名 C列[2]
 	lineNumber: string;				// 行番号 D列[3]
-	// impact: string;				// 影響度 E列[4]
+	impact: string;					// 影響度 E列[4]
 	// typeOfProblem: string;		// 問題の種類 F列[5]
 	type: string;					// 型 G列[6]
 	checker: string;				// チェッカー名 H列[7]
@@ -126,11 +126,10 @@ const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 			// const columns = line.split(',');
 			const columns = line.split(',').map(column => column.replace(/"/g, ''));	// ダブルクォーテーション削除
 			const issue: Issue = {
-				// cid: parseInt(columns[0]),
 				cid: columns[0],
 				filename: columns[1] ? columns[1].substring(columns[1].lastIndexOf('/') + 1) : '',
-				// lineNumber: parseInt(columns[3]),
 				lineNumber: columns[3],
+				impact: columns[4],
 				type: columns[6],
 				checker: columns[7],
 				eventTag: columns[11],
@@ -140,6 +139,7 @@ const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 			issues.push(issue);
 		}
 
+		/*
 		for (let i = 0; i < 5; i++) {	// max: issues.length
 			connection.console.log(`取得したデータ:`);
 			connection.console.log(`  cid: ${issues[i].cid}`);
@@ -151,6 +151,7 @@ const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 			connection.console.log(`  mainEvent: ${issues[i].mainEvent}`);
 
 		}
+		*/
 
 	} catch (err) {
 		connection.console.error(`Failed to open CSV file: ${err}`);
@@ -232,7 +233,7 @@ interface ExampleSettings {
 // グローバル設定。「workspace/configuration」リクエストがクライアントでサポートされていない場合に使用されます。
 // これは、この例で提供されているクライアントでこのサーバーを使用する場合には当てはまりませんが、
 // 他のクライアントでは発生する可能性があることに注意してください。
-const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };
+const defaultSettings: ExampleSettings = { maxNumberOfProblems: 1000 };	// maxNumberOfProblems を使わない
 let globalSettings: ExampleSettings = defaultSettings;
 
 // Cache the settings of all open documents
@@ -281,52 +282,6 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	const text = textDocument.getText();
 	const diagnostics: Diagnostic[] = [];
 
-	/* 大文字診断をやめる
-	// The validator creates diagnostics for all uppercase words length 2 and more
-	// バリデータは、長さ 2 以降のすべての大文字の単語の診断を作成します
-	const pattern = /\b[A-Z]{2,}\b/g;
-	let m: RegExpExecArray | null;
-
-	let problems = 0;
-	const diagnostics: Diagnostic[] = [];
-	const resolvedSettings = await settings;
-	while ((m = pattern.exec(text)) && problems < resolvedSettings.maxNumberOfProblems) {
-		problems++;
-		const diagnostic: Diagnostic = {
-			severity: DiagnosticSeverity.Warning,
-			range: {
-				start: textDocument.positionAt(m.index),
-				end: textDocument.positionAt(m.index + m[0].length)
-			},
-			message: `${m[0]} is all uppercase.`,
-			source: 'ex'
-		};
-		if (hasDiagnosticRelatedInformationCapability) {
-			diagnostic.relatedInformation = [
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Spelling matters'
-				},
-				{
-					location: {
-						uri: textDocument.uri,
-						range: Object.assign({}, diagnostic.range)
-					},
-					message: 'Particularly for names'
-				}
-			];
-		}
-		diagnostics.push(diagnostic);
-	}
-
-	// Send the computed diagnostics to VSCode.
-	// 計算された診断を VSCode に送信します。
-	// await connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
-	*/
-
 	// openCSV関数からcsvDataを取得
 	const lines = text.split('\n');		// 行数
 
@@ -337,9 +292,15 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 				// 行番号が一致したら
 				if (i + 1 === parseInt(issue.lineNumber)) {
 					// 該当行に波線を引く
-					let content = 'CID: ' + issue.cid + ': ' + issue.type + ' (' + issue.checker + ')\n' + issue.eventTag + ': ' + issue.mainEvent;
+					let content = 
+						'CID: ' + issue.cid + ': '
+						 + issue.type
+						 + ' (' + issue.checker + ') , '
+						 + issue.impact + '\n'
+						 + issue.eventTag + ': '
+						 + issue.mainEvent;
 					const diagnostic: Diagnostic = {
-						severity: DiagnosticSeverity.Warning,
+						severity: getSeverity(issue.impact),
 						range: {
 							// start: { line: issue.lineNumber - 1, character: 0 },
 							start: { line: i, character: 0 },
@@ -356,6 +317,18 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	}
 	await connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 
+}
+
+function getSeverity(impact: string): DiagnosticSeverity {
+	if (impact === '高') {
+		return DiagnosticSeverity.Error;
+	} else if (impact === '中') {
+		return DiagnosticSeverity.Warning;
+	} else if (impact === '低') {
+		return DiagnosticSeverity.Information;
+	} else {
+		return DiagnosticSeverity.Hint;
+	}
 }
 
 function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
