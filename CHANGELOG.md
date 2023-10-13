@@ -1,3 +1,8 @@
+## v0.3.1
+
+- 2023/10/13 keides2 Added constraints when reading CSV files (files whose format is not snapshot_id_xxxx.csv will not be read).
+- CSVファイル読み込み時の制約を追加（書式が snapshot_id_xxxx.csv でないファイルを読み込まない）
+
 ## v0.3.0
 
 - 2023/10/10 keides2 v0.3.0 The color of the wavy line, the level of the diagnosis result, and the icon change depending on the impact level: "high," "medium," and "low."
