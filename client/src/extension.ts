@@ -78,6 +78,9 @@ export function activate(context: ExtensionContext) {
 			placeHolder: 'fullpath/to/snapshot_id_xxxxx.csv'
 		});
 
+		const csvFileName = path.basename(csvFilePath);		// 拡張子を含む
+		const csvExtName = path.extname(csvFileName);
+
 		if (!csvFilePath) {
 			await window.showWarningMessage('No CSV file name provided. Exiting.');
 			return;
@@ -86,6 +89,9 @@ export function activate(context: ExtensionContext) {
 
 		if (!fs.existsSync(csvFilePath)) {
 			void window.showInformationMessage(`File does not exist. Try again.: ${csvFilePath}`);
+
+		} else if (!csvFileName.startsWith('snapshot_id_') || csvExtName !== '.csv') {
+			void window.showInformationMessage(`ファイル名の書式が snapshot_id_xxxxx.csv ではありません: ${csvFileName}`);
 
 		} else {
 			void window.showInformationMessage(`File opened: ${csvFilePath}`);

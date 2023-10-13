@@ -48,25 +48,25 @@ interface Issue {
 	// functionDisplayName: string;
 	lineNumber: number;
 	// impact: string;						// 影響度
-	// type: string;						// 問題の種類
+	// type: string;						// 型（問題の種類）
 	// type2: string;
 	// category: string;					// カテゴリ
 	// category2: string;					// カテゴリ2
 	eventDescription: string;
 	// CWE: string;
 	// count: number;						// カウント
-	// checker: string;					// チェッカー
+	// checker: string;						// チェッカー
 	// status: string;						// 状態
 	// first_detect: string;				// 初回検出日
 	// comparison: string;					// 比較
-	// firstSnapshotId: string;			// 最初のスナップショットID
+	// firstSnapshotId: string;				// 最初のスナップショットID
 	// firstSnapshot_date: string;			// 最初のスナップショットの日付
-	// firstSnapshotStream: string;		// 最初のスナップショットのストリーム
+	// firstSnapshotStream: string;			// 最初のスナップショットのストリーム
 	// lastSnapshotId: string;				// 最後のスナップショット
 	// lastSnapshotDate: string;			// 最後のスナップショットの日付
 	// lastSnapshotStream: string;			// 最後のスナップショットのストリーム
-	// lastTriagedDate: string;			// 最終選別日
-	// lastTriagedUser: string;			// 最終選別ユーザー
+	// lastTriagedDate: string;				// 最終選別日
+	// lastTriagedUser: string;				// 最終選別ユーザー
 	// lastTriagedComment: string;			// 最終選別コメント
 	// classification: string;				// 分類
 	// importance: string;					// 重要度
@@ -105,16 +105,6 @@ let issues: Issue[] = [];
 const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 	// csvFilePath をフルパスで入力
 	connection.console.log(csvFilePath);
-
-	/* サーバーの起動に失敗する -> クライアント側
-	if (!fs.existsSync(csvFilePath)) {
-		void window.showInformationMessage(`File does not exist. Try again.: ${csvFilePath}`);
-
-	} else {
-		void window.showInformationMessage(`File opened: ${csvFilePath}`);
-
-	}
-	*/
 
 	try {
 		const data = fs.readFileSync(csvFilePath);
@@ -292,13 +282,13 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 				// 行番号が一致したら
 				if (i + 1 === parseInt(issue.lineNumber)) {
 					// 該当行に波線を引く
-					let content = 
+					let content =
 						'CID: ' + issue.cid + ': '
-						 + issue.type
-						 + ' (' + issue.checker + ') , '
-						 + issue.impact + '\n'
-						 + issue.eventTag + ': '
-						 + issue.mainEvent;
+						+ issue.type
+						+ ' (' + issue.checker + ') , '
+						+ issue.impact + '\n'
+						+ issue.eventTag + ': '
+						+ issue.mainEvent;
 					const diagnostic: Diagnostic = {
 						severity: getSeverity(issue.impact),
 						range: {
