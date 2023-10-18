@@ -92,7 +92,9 @@ This was based on Microsoft's `https://github.com/Microsoft/vscode-extension-sam
 - 2023/09/20 keides2 v0.1.0 webpack
 - 2023/10/07 keides2 V0.2.0 Removed the uppercase character detection function for 3 or more characters.
 - 2023/10/10 keides2 v0.3.0 The color of the wavy line, the level of the diagnosis result, and the icon change depending on the impact level: "high," "medium," and "low."
-- 2023/10/13 keides2 Added constraints when reading CSV files (files whose format is not snapshot_id_xxxx.csv will not be read).
+- 2023/10/13 keides2 v0.3.1 Added constraints when reading CSV files (files whose format is not snapshot_id_xxxx.csv will not be read).
+- 2023/10/18 keides2 v0.3.2 Outputs an error when the return value type of the input box is undefined. (does not display an error dialog)
+The input box disappears when you move the focus, so "keep the input box open even if the focus moves to another part of the editor or to another window" (a usability improvement)
 
 ---
 # COVLint (in Japanese)
@@ -184,7 +186,6 @@ This was based on Microsoft's `https://github.com/Microsoft/vscode-extension-sam
 
 Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp-sample`や、[@Ikuyadeu](https://qiita.com/Ikuyadeu) 氏の記事 [Language Server Protocol開発チュートリアル](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff) を参考にしました。
 
-
 ---
 
 - 2023/09/15 keides2 v0.0.1 初版
@@ -194,3 +195,5 @@ Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp
 - 2023/10/07 keides2 v0.2.0 ３文字以上の大文字検出をやめる
 - 2023/10/10 keides2 v0.3.0 影響度「高」、「中」、「低」に対応し、波線の色と診断結果のレベルとアイコンを変える
 - 2023/10/13 keides2 v0.3.1 CSVファイル読み込み時の制約を追加（書式が snapshot_id_xxxx.csv でないファイルを読み込まない）
+- 2023/10/18 keides2 v0.3.2 入力ボックスの戻り値の型が、 undefined の時にエラーを出力する（エラーダイアログは出さない）
+フォーカスを移動すると入力ボックスが消えてしまうので、「フォーカスがエディタの他の部分や他のウィンドウに移動しても、入力ボックスを開いたままにする」（ユーザビリティ向上）
