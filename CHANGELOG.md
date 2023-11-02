@@ -1,3 +1,8 @@
+## v0.3.3
+
+- 2023/11/06 keides2 v0.3.3 Supports cases where CSV file values include commas.
+- 2023/11/06 keides2 v0.3.3 CSVファイルの値がコンマを含む場合に対応
+
 ## v0.3.2
 
 - 2023/10/18 keides2 Outputs an error when the return value type of the input box is undefined. (does not display an error dialog)

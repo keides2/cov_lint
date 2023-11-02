@@ -5,7 +5,7 @@
   "author": "keides2",
   "publisher": "keides2",
   "license": "MIT",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keides2/cov_lint.git"
@@ -82,6 +82,7 @@
   },
   "dependencies": {
     "@vscode/test-electron": "^2.3.4",
+    "csv-parse": "^5.5.2",
     "encoding": "^0.1.13",
     "merge-options": "^3.0.4",
     "ts-loader": "^9.4.4"

@@ -19,6 +19,7 @@ import {
 } from 'vscode-languageserver-textdocument';
 import * as fs from 'fs';
 import * as iconv from 'iconv-lite';
+import { parse } from 'csv-parse/sync';
 import * as path from 'path';
 
 // Create a connection for the server, using Node's IPC as a transport.
@@ -110,8 +111,23 @@ const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 		const data = fs.readFileSync(csvFilePath);
 		const decodedData = iconv.decode(data, 'SHIFT_JIS');
 		const lines = decodedData.split('\n');
+		// コンマを含む関数名に対応（C#）
+		const records = parse(decodedData, {
+			// ヘッダ行をキーとするオブジェクトの配列としてレコードを取得
+			// これにより、カラム名で直接アクセス可能
+			// columns: true,
+			columns: false,			// CSVのヘッダ行を使用しない
+			skip_empty_lines: true,
+			delimiter: ',',			// カンマを区切り文字として明示的に指定
+			quote: '"',				// ダブルクォーテーションをクォート文字として明示的に指定
+			ltrim: true,			// 値の前の空白を削除
+			rtrim: true,			// 値の後の空白を削除
+		});
+			
 		// 全指摘を issue に格納する
 		issues = [];
+		
+		/*
 		for (const line of lines) {
 			// const columns = line.split(',');
 			const columns = line.split(',').map(column => column.replace(/"/g, ''));	// ダブルクォーテーション削除
@@ -128,20 +144,22 @@ const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 			};
 			issues.push(issue);
 		}
-
-		/*
-		for (let i = 0; i < 5; i++) {	// max: issues.length
-			connection.console.log(`取得したデータ:`);
-			connection.console.log(`  cid: ${issues[i].cid}`);
-			connection.console.log(`  filename: ${issues[i].filename}`);
-			connection.console.log(`  lineNumber: ${issues[i].lineNumber}`);
-			connection.console.log(`  type: ${issues[i].type}`);
-			connection.console.log(`  checker: ${issues[i].checker}`);
-			connection.console.log(`  eventTag: ${issues[i].eventTag}`);
-			connection.console.log(`  mainEvent: ${issues[i].mainEvent}`);
-
-		}
 		*/
+
+		for (const record of records) {
+			const issue: Issue = {
+				cid: record[0],
+				filename: record[1] ? record[1].substring(record[1].lastIndexOf('/') + 1) : '',
+				lineNumber: record[3],
+				impact: record[4],
+				type: record[6],
+				checker: record[7],
+				eventTag: record[11],
+				mainEvent: record[10],
+				// ... 他のプロパティも同様に設定 ...
+			};
+				  issues.push(issue);
+		}
 
 	} catch (err) {
 		connection.console.error(`Failed to open CSV file: ${err}`);
