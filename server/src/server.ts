@@ -92,8 +92,8 @@ interface Issue {
 	mainEvent: string;				// メインイベントの説明 K列[10]
 	eventTag: string;				// イベントタグ L列[11]
 	// category: string;			// カテゴリ M列[12]
-	// localEffect: string;			// ローカル効果 N列[13]
-	// description: string;			// 説明 O列[14]
+	localEffect: string;			// ローカル効果 N列[13]
+	description: string;			// 説明 O列[14]
 	// firstDetect: string;			// 初回の検出日 P列[15]
 	// firstSnapshotId: string;		// 初回のスナップショットID Q列[16]
 	// firstStream: string;			// 初回のストリーム R列[17]
@@ -123,10 +123,10 @@ const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 			ltrim: true,			// 値の前の空白を削除
 			rtrim: true,			// 値の後の空白を削除
 		});
-			
+
 		// 全指摘を issue に格納する
 		issues = [];
-		
+
 		/*
 		for (const line of lines) {
 			// const columns = line.split(',');
@@ -156,9 +156,11 @@ const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 				checker: record[7],
 				eventTag: record[11],
 				mainEvent: record[10],
+				localEffect: record[13],
+				description: record[14]
 				// ... 他のプロパティも同様に設定 ...
 			};
-				  issues.push(issue);
+			issues.push(issue);
 		}
 
 	} catch (err) {
@@ -306,7 +308,10 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 						+ ' (' + issue.checker + ') , '
 						+ issue.impact + '\n'
 						+ issue.eventTag + ': '
-						+ issue.mainEvent;
+						+ issue.mainEvent + '\n'
+						+ '* ' + issue.description + '\n'
+						+ '* ' + issue.localEffect;
+
 					const diagnostic: Diagnostic = {
 						severity: getSeverity(issue.impact),
 						range: {

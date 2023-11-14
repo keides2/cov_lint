@@ -1,3 +1,8 @@
+## v0.4.0
+
+- 2023/11/14 keides2 v0.4.0 Added indication items "local effect" and "explanation".
+- 2023/11/14 keides2 v0.4.0 指摘項目「ローカル効果」と「説明」を追加表示
+
 ## v0.3.3
 
 - 2023/11/06 keides2 v0.3.3 Supports cases where CSV file values include commas.

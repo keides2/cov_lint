@@ -1,7 +1,7 @@
 {
 	"name": "covlint-server",
 	"description": "Implementation of a language server in node.",
-	"version": "0.3.3",
+	"version": "0.4.0",
 	"author": "keides2",
 	"license": "MIT",
 	"engines": {

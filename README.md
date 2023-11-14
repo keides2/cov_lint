@@ -96,6 +96,7 @@ This was based on Microsoft's `https://github.com/Microsoft/vscode-extension-sam
 - 2023/10/18 keides2 v0.3.2 Outputs an error when the return value type of the input box is undefined. (does not display an error dialog)
 The input box disappears when you move the focus, so "keep the input box open even if the focus moves to another part of the editor or to another window" (a usability improvement)
 - 2023/11/06 keides2 v0.3.3 Supports cases where CSV file values include commas.
+- 2023/11/14 keides2 v0.4.0 Added indication items "local effect" and "explanation".
 
 ---
 # COVLint (in Japanese)
@@ -199,3 +200,4 @@ Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp
 - 2023/10/18 keides2 v0.3.2 入力ボックスの戻り値の型が、 undefined の時にエラーを出力する（エラーダイアログは出さない）
 フォーカスを移動すると入力ボックスが消えてしまうので、「フォーカスがエディタの他の部分や他のウィンドウに移動しても、入力ボックスを開いたままにする」（ユーザビリティ向上）
 - 2023/11/06 keides2 v0.3.3 CSVファイルの値がコンマを含む場合に対応
+- 2023/11/14 keides2 v0.4.0 指摘項目「ローカル効果」と「説明」を追加表示
