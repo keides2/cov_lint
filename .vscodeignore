@@ -25,13 +25,13 @@ server/out/package.json
 !server/out/eslintServer.js
 
 # docs
-docs/*
+docs/**
 
 # evac
-evac/*
+evac/**
 
 # snapshots
-snapshots/*
+snapshots/**
 
 # ChatGPT advice
 **/node_modules/**
