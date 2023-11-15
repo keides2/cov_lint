@@ -27,6 +27,12 @@ server/out/package.json
 # docs
 docs/*
 
+# evac
+evac/*
+
+# snapshots
+snapshots/*
+
 # ChatGPT advice
 **/node_modules/**
 **/src/**
