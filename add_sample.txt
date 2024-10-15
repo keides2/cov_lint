@@ -1,0 +1,24 @@
+お待たせしました。
+JavaScriptとPythonのサンプルコードと、サンプルCSVファイルを追加します。
+サンプルCSVファイルは、サンプルコードを Coverity にかけた後に、cov_snap を使って生成したファイルです。
+cov_snap が出力する CSVファイルは、Coverity Connect からエクスポートする項目より多くの項目を含んでいます。
+2列目の「ファイル名」のパスをあなたのパスに書き換えてください。
+COVLint の操作手順に従って、CSVファイルを開き、そしてサンプルコードを開くと、問題の個所に波線がつきます。
+波線のコードをマウスオーバーすると指摘が現れます。（参照: sample_screen_1.jpg, sample_screen_2.jpg）
+問題タブの問題をクリックしても、問題のソースコードにジャンプして指摘を表示することができます。
+
+※ CSVファイルの文字コードは、CP932 です。
+cov_snap は、コードの整理ができましたら公開したいと思います。
+
+---
+Sorry for the wait.
+I will add sample code for JavaScript and Python, and a sample CSV file.
+The sample CSV file was generated using cov_snap after running the sample code through Coverity.
+The CSV file output by cov_snap contains more items than those exported from Coverity Connect.
+Please change the path in the "File name" column in the second column to your own path.
+If you open the CSV file following the COVLint operating instructions and then open the sample code, you will see wavy lines under the areas with problems.
+If you hover your mouse over the wavy code, the issues will appear. (see: sample_screen_1.jpg, sample_screen_2.jpg)
+You can also jump to the source code of the problem and view the issues by clicking on the issue in the Problems tab.
+
+* The character code for CSV files is CP932.
+I would like to release cov_snap once I have organized the code.
