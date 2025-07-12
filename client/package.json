@@ -11,10 +11,13 @@
 		"vscode": "^1.75.0"
 	},
 	"dependencies": {
+		"glob": "^11.0.3",
 		"merge-options": "^3.0.4",
 		"vscode-languageclient": "^8.1.0"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.75.1"
+		"@types/mocha": "^10.0.10",
+		"@types/node": "^24.0.13",
+		"@types/vscode": "^1.102.0"
 	}
 }

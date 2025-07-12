@@ -12,9 +12,14 @@
 		"url": "https://github.com/keides2/cov_lint"
 	},
 	"dependencies": {
+		"csv-parse": "^6.0.0",
+		"iconv-lite": "^0.6.3",
 		"vscode": "^1.1.34",
 		"vscode-languageserver": "^8.1.0",
-		"vscode-languageserver-textdocument": "^1.0.8"
+		"vscode-languageserver-textdocument": "^1.0.12"
 	},
-	"scripts": {}
+	"scripts": {},
+	"devDependencies": {
+		"@types/node": "^24.0.13"
+	}
 }

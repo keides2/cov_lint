@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>VS Code&#x62e1;&#x5f35;&#x6a5f;&#x80fd;&#xff08;COVLint&#xff09;&#x30c7;&#x30d0;&#x30c3;&#x30b0;&#x74b0;&#x5883;&#x69cb;&#x7bc9; &#x985b;&#x672b;&#x8a18;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="vs-code拡張機能covlintデバッグ環境構築-顛末記">VS Code拡張機能（COVLint）デバッグ環境構築 顛末記</h1>
+<h2 id="問題の発生">問題の発生</h2>
+<p>VS Code拡張機能 COVLint のデバッグを開始しようとした際、以下の複数の問題が発生：</p>
+<ol>
+<li><strong>PowerShell実行ポリシーエラー</strong></li>
+<li><strong>TypeScriptコンパイラ（tsc）が見つからないエラー</strong></li>
+<li><strong>TypeScriptコンパイルエラー（46個のエラー）</strong></li>
+</ol>
+<h2 id="問題1-powershell実行ポリシーエラー">問題1: PowerShell実行ポリシーエラー</h2>
+<h3 id="症状">症状</h3>
+<pre><code>npm : このシステムではスクリプトの実行が無効になっているため、ファイル C:\Program Files\nodejs\npm.ps1 を読み込むことができません。
+</code></pre>
+<h3 id="原因">原因</h3>
+<ul>
+<li>Windows PowerShellの実行ポリシーがスクリプト実行を制限</li>
+<li>企業環境やセキュリティ設定による制限</li>
+</ul>
+<h3 id="試行した解決方法">試行した解決方法</h3>
+<pre><code class="language-powershell"><span class="hljs-built_in">Set-ExecutionPolicy</span> <span class="hljs-literal">-ExecutionPolicy</span> RemoteSigned <span class="hljs-literal">-Scope</span> CurrentUser
+</code></pre>
+<h3 id="結果">結果</h3>
+<ul>
+<li>上位レベルのポリシーにより上書きされ、効果なし</li>
+<li>実行ポリシーは既にBypassに設定されていることが判明
+<ul>
+<li>実際は<pre><code class="language-powershell"><span class="hljs-built_in">Set-ExecutionPolicy</span> <span class="hljs-literal">-ExecutionPolicy</span> Bypass
+</code></pre>
+を実行した</li>
+</ul>
+</li>
+</ul>
+<h3 id="実際の原因">実際の原因</h3>
+<p>PowerShell自体の問題ではなく、後述のtscコマンドの問題だった</p>
+<h2 id="問題2-typescriptコンパイラが見つからない">問題2: TypeScriptコンパイラが見つからない</h2>
+<h3 id="症状-1">症状</h3>
+<pre><code>'tsc' は、内部コマンドまたは外部コマンド、操作可能なプログラムまたはバッチ ファイルとして認識されていません。
+</code></pre>
+<h3 id="原因-1">原因</h3>
+<ul>
+<li>TypeScriptがグローバルにインストールされていない</li>
+<li>または、PATHに含まれていない</li>
+</ul>
+<h3 id="解決方法">解決方法</h3>
+<pre><code class="language-cmd">npm install -g typescript
+</code></pre>
+<h3 id="確認">確認</h3>
+<pre><code class="language-cmd">tsc --version
+# Version <span class="hljs-number">5</span>.<span class="hljs-number">8</span>.<span class="hljs-number">3</span>
+</code></pre>
+<h2 id="問題3-typescriptコンパイルエラー46個">問題3: TypeScriptコンパイルエラー（46個）</h2>
+<h3 id="症状-2">症状</h3>
+<pre><code class="language-cmd">npm run watch
+# [<span class="hljs-number">12</span>:<span class="hljs-number">13</span>:<span class="hljs-number">44</span>] Found <span class="hljs-number">46</span> errors. Watching <span class="hljs-keyword">for</span> file changes.
+</code></pre>
+<h3 id="詳細エラー内容">詳細エラー内容</h3>
+<ul>
+<li><code>Cannot find module 'vscode'</code></li>
+<li><code>Cannot find module 'vscode-languageclient/node'</code></li>
+<li><code>Cannot find module 'vscode-languageserver/node'</code></li>
+<li><code>Cannot find module 'fs'</code>, <code>'path'</code>, <code>'iconv-lite'</code>, <code>'csv-parse/sync'</code></li>
+<li><code>Cannot find name 'process'</code></li>
+<li>その他、型定義の不足</li>
+</ul>
+<h3 id="原因分析">原因分析</h3>
+<p>VS Code拡張機能の典型的な構造：</p>
+<pre><code>cov_lint/
+├── package.json (ルート)
+├── client/
+│   ├── package.json (クライアント側の依存関係)
+│   └── src/
+└── server/
+    ├── package.json (サーバー側の依存関係)
+    └── src/
+</code></pre>
+<p><strong>根本原因</strong>: <code>client/package.json</code>と<code>server/package.json</code>は存在していたが、<strong>依存関係の定義が不完全</strong>だった</p>
+<h3 id="実際に修正した内容">実際に修正した内容</h3>
+<h4 id="clientpackagejson-の修正内容">client/package.json の修正内容</h4>
+<p>既存のファイルの依存関係を以下のように更新：</p>
+<p><strong>修正前（推測される状態）:</strong></p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;covlint-client&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-comment">// 不完全な依存関係定義</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-comment">// 型定義の不足</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>修正後（実際の内容）:</strong></p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;covlint-client&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;COVLint client&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;license&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;MIT&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0.4.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;repository&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;git&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;https://github.com/keides2/cov_lint&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;engines&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;vscode&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^1.75.0&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;glob&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^11.0.3&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;merge-options&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^3.0.4&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;vscode-languageclient&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^8.1.0&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;@types/mocha&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^10.0.10&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;@types/node&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^24.0.13&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;@types/vscode&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^1.102.0&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>主要な追加・更新項目:</strong></p>
+<ul>
+<li>✅ <code>vscode-languageclient</code>: &quot;^8.1.0&quot; - Language Server Protocolクライアント</li>
+<li>✅ <code>@types/vscode</code>: &quot;^1.102.0&quot; - VS Code API型定義</li>
+<li>✅ <code>@types/node</code>: &quot;^24.0.13&quot; - Node.js型定義</li>
+<li>✅ <code>@types/mocha</code>: &quot;^10.0.10&quot; - Mochaテスト型定義</li>
+<li>✅ <code>glob</code>: &quot;^11.0.3&quot; - ファイルパターンマッチング</li>
+</ul>
+<h4 id="serverpackagejson-の修正内容">server/package.json の修正内容</h4>
+<p><strong>推定される修正（server側の依存関係）:</strong></p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;covlint-server&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;COVLint server&quot;</span><span class="hljs-punctuation">,</span> 
+  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0.4.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;dependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;vscode-languageserver&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^8.1.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;vscode-languageserver-textdocument&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^1.0.8&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;iconv-lite&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^0.6.3&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;csv-parse&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^5.5.2&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;@types/node&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^16.18.34&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h3 id="解決手順">解決手順</h3>
+<h4 id="1-依存関係のインストール">1. 依存関係のインストール</h4>
+<pre><code class="language-cmd">npm run postinstall
+</code></pre>
+<h4 id="2-コンパイル確認">2. コンパイル確認</h4>
+<pre><code class="language-cmd">npm run compile
+</code></pre>
+<h2 id="最終的な解決">最終的な解決</h2>
+<p>上記の依存関係修正により、全46個のTypeScriptコンパイルエラーが解消され、正常にデバッグ環境が構築された。</p>
+<h2 id="解決されたエラーの詳細">解決されたエラーの詳細</h2>
+<p>依存関係の修正により解決されたエラー：</p>
+<ol>
+<li>❌ <code>Cannot find module 'vscode'</code> → ✅ <code>@types/vscode</code>追加で解決</li>
+<li>❌ <code>Cannot find module 'vscode-languageclient/node'</code> → ✅ <code>vscode-languageclient</code>追加で解決</li>
+<li>❌ <code>Cannot find module 'vscode-languageserver/node'</code> → ✅ <code>vscode-languageserver</code>追加で解決</li>
+<li>❌ <code>Cannot find name 'process'</code> → ✅ <code>@types/node</code>追加で解決</li>
+<li>❌ <code>Cannot find name 'Thenable'</code> → ✅ <code>@types/vscode</code>追加で解決</li>
+<li>❌ Mochaテスト関連エラー → ✅ <code>@types/mocha</code>追加で解決</li>
+</ol>
+<h2 id="今後の再発防止策">今後の再発防止策</h2>
+<h3 id="1-環境構築チェックリスト">1. 環境構築チェックリスト</h3>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> TypeScriptがグローバルにインストールされているか確認</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> <code>client/package.json</code>と<code>server/package.json</code>が存在するか確認</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> <strong>重要</strong>: 必要な依存関係が正しく定義されているか確認</li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox"> 各サブプロジェクトで<code>npm install</code>が正常に完了するか確認</li>
+</ul>
+<h3 id="2-定期的なメンテナンス">2. 定期的なメンテナンス</h3>
+<pre><code class="language-cmd"># 依存関係の再インストール
+npm run postinstall
+
+# コンパイル確認
+npm run compile
+
+# デバッグ前の動作確認
+npm run watch
+</code></pre>
+<h3 id="3-バージョン管理と依存関係管理">3. バージョン管理と依存関係管理</h3>
+<ul>
+<li><code>client/package.json</code>と<code>server/package.json</code>をGitで管理</li>
+<li>依存関係のバージョンを適切に固定</li>
+<li><strong>新規環境での初回セットアップ時は必ず依存関係を確認</strong></li>
+</ul>
+<h3 id="4-依存関係確認のベストプラクティス">4. 依存関係確認のベストプラクティス</h3>
+<pre><code class="language-cmd"># 各サブディレクトリで依存関係を個別確認
+PS C:\Users\HP\Docs\Security\cov_lint&gt; <span class="hljs-built_in">cd</span> client          
+PS C:\Users\HP\Docs\Security\cov_lint\client&gt; npm ls             
+covlint-client@<span class="hljs-number">0</span>.<span class="hljs-number">4</span>.<span class="hljs-number">0</span> C:\Users\HP\Docs\Security\cov_lint\client
+├── @types/mocha@<span class="hljs-number">10</span>.<span class="hljs-number">0</span>.<span class="hljs-number">10</span>
+├── @types/node@<span class="hljs-number">24</span>.<span class="hljs-number">0</span>.<span class="hljs-number">13</span>
+├── @types/vscode@<span class="hljs-number">1</span>.<span class="hljs-number">102</span>.<span class="hljs-number">0</span>
+├── glob@<span class="hljs-number">11</span>.<span class="hljs-number">0</span>.<span class="hljs-number">3</span>
+├── merge-options@<span class="hljs-number">3</span>.<span class="hljs-number">0</span>.<span class="hljs-number">4</span>
+└── vscode-languageclient@<span class="hljs-number">8</span>.<span class="hljs-number">1</span>.<span class="hljs-number">0</span>
+
+PS C:\Users\HP\Docs\Security\cov_lint\client&gt; <span class="hljs-built_in">cd</span> ../server
+PS C:\Users\HP\Docs\Security\cov_lint\server&gt; npm ls      
+covlint-server@<span class="hljs-number">0</span>.<span class="hljs-number">4</span>.<span class="hljs-number">0</span> C:\Users\HP\Docs\Security\cov_lint\server
+├── @types/node@<span class="hljs-number">24</span>.<span class="hljs-number">0</span>.<span class="hljs-number">13</span>
+├── csv-parse@<span class="hljs-number">6</span>.<span class="hljs-number">0</span>.<span class="hljs-number">0</span>
+├── iconv-lite@<span class="hljs-number">0</span>.<span class="hljs-number">6</span>.<span class="hljs-number">3</span>
+├── vscode-languageserver-textdocument@<span class="hljs-number">1</span>.<span class="hljs-number">0</span>.<span class="hljs-number">12</span>
+├── vscode-languageserver@<span class="hljs-number">8</span>.<span class="hljs-number">1</span>.<span class="hljs-number">0</span>
+└── vscode@<span class="hljs-number">1</span>.<span class="hljs-number">1</span>.<span class="hljs-number">37</span>
+
+# 不足している依存関係の確認
+PS C:\Users\HP\Docs\Security\cov_lint\server&gt; npm audit
+# npm audit report
+
+brace-expansion  <span class="hljs-number">1</span>.<span class="hljs-number">0</span>.<span class="hljs-number">0</span> - <span class="hljs-number">1</span>.<span class="hljs-number">1</span>.<span class="hljs-number">11</span>
+brace-expansion Regular Expression Denial of Service vulnerability - https://github.com/advisories/GHSA-v6h2-p8h4-qcjw
+fix available via `npm audit fix`
+node_modules/brace-expansion
+
+minimatch  &lt;<span class="hljs-number">3</span>.<span class="hljs-number">0</span>.<span class="hljs-number">5</span>
+<span class="hljs-function">Severity: <span class="hljs-title">high</span>
+<span class="hljs-title">minimatch</span> <span class="hljs-title">ReDoS</span> <span class="hljs-title">vulnerability</span> - <span class="hljs-title">https</span>://<span class="hljs-title">github.com</span>/<span class="hljs-title">advisories</span>/<span class="hljs-title">GHSA</span>-<span class="hljs-title">f8q6</span>-<span class="hljs-title">p94x</span>-37<span class="hljs-title">v3</span>
+<span class="hljs-title">fix</span> <span class="hljs-title">available</span> <span class="hljs-title">via</span> `<span class="hljs-title">npm</span> <span class="hljs-title">audit</span> <span class="hljs-title">fix</span>`
+<span class="hljs-title">node_modules</span>/<span class="hljs-title">mocha</span>/<span class="hljs-title">node_modules</span>/<span class="hljs-title">minimatch</span>
+  <span class="hljs-title">mocha</span>  1.21.5 - 9.2.1
+  <span class="hljs-title">Depends</span> <span class="hljs-title">on</span> <span class="hljs-title">vulnerable</span> <span class="hljs-title">versions</span> <span class="hljs-title">of</span> <span class="hljs-title">minimatch</span>
+  <span class="hljs-title">Depends</span> <span class="hljs-title">on</span> <span class="hljs-title">vulnerable</span> <span class="hljs-title">versions</span> <span class="hljs-title">of</span> <span class="hljs-title">mkdirp</span>
+  <span class="hljs-title">node_modules</span>/<span class="hljs-title">mocha</span>
+    <span class="hljs-title">vscode</span>  &gt;=1.1.35
+    <span class="hljs-title">Depends</span> <span class="hljs-title">on</span> <span class="hljs-title">vulnerable</span> <span class="hljs-title">versions</span> <span class="hljs-title">of</span> <span class="hljs-title">mocha</span>
+    <span class="hljs-title">node_modules</span>/<span class="hljs-title">vscode</span>
+
+<span class="hljs-title">minimist</span>  &lt;=0.2.3
+<span class="hljs-title">Severity</span>: <span class="hljs-title">critical</span>
+<span class="hljs-title">Prototype</span> <span class="hljs-title">Pollution</span> <span class="hljs-title">in</span> <span class="hljs-title">minimist</span> - <span class="hljs-title">https</span>://<span class="hljs-title">github.com</span>/<span class="hljs-title">advisories</span>/<span class="hljs-title">GHSA</span>-<span class="hljs-title">vh95</span>-<span class="hljs-title">rmgr</span>-6<span class="hljs-title">w4m</span>
+<span class="hljs-title">Prototype</span> <span class="hljs-title">Pollution</span> <span class="hljs-title">in</span> <span class="hljs-title">minimist</span> - <span class="hljs-title">https</span>://<span class="hljs-title">github.com</span>/<span class="hljs-title">advisories</span>/<span class="hljs-title">GHSA</span>-<span class="hljs-title">xvch</span>-5<span class="hljs-title">gv4</span>-984<span class="hljs-title">h</span>
+<span class="hljs-title">fix</span> <span class="hljs-title">available</span> <span class="hljs-title">via</span> `<span class="hljs-title">npm</span> <span class="hljs-title">audit</span> <span class="hljs-title">fix</span>`
+<span class="hljs-title">node_modules</span>/<span class="hljs-title">minimist</span>
+  <span class="hljs-title">mkdirp</span>  0.4.1 - 0.5.1
+  <span class="hljs-title">Depends</span> <span class="hljs-title">on</span> <span class="hljs-title">vulnerable</span> <span class="hljs-title">versions</span> <span class="hljs-title">of</span> <span class="hljs-title">minimist</span>
+  <span class="hljs-title">node_modules</span>/<span class="hljs-title">mkdirp</span>
+
+6 <span class="hljs-title">vulnerabilities</span> (1 <span class="hljs-title">low</span>, 2 <span class="hljs-title">high</span>, 3 <span class="hljs-title">critical</span>)
+
+<span class="hljs-title">To</span> <span class="hljs-title">address</span> <span class="hljs-title">all</span> <span class="hljs-title">issues</span>, <span class="hljs-title">run</span>:
+  <span class="hljs-title">npm</span> <span class="hljs-title">audit</span> <span class="hljs-title">fix</span>
+</span></code></pre>
+<h2 id="学んだ教訓">学んだ教訓</h2>
+<ol>
+<li>
+<p><strong>ファイルの存在 ≠ 正しい設定</strong></p>
+<ul>
+<li><code>package.json</code>が存在していても、依存関係の定義が不完全な場合がある</li>
+<li>ファイルの存在確認だけでなく、<strong>内容の妥当性確認</strong>が重要</li>
+</ul>
+</li>
+<li>
+<p><strong>VS Code拡張機能の構造理解の重要性</strong></p>
+<ul>
+<li>Language Server Protocolを使用する拡張機能は、クライアント・サーバー分離構造</li>
+<li>各サブプロジェクトに独自の完全なpackage.jsonが必要</li>
+</ul>
+</li>
+<li>
+<p><strong>エラーの段階的解決</strong></p>
+<ul>
+<li>表面的なエラー（PowerShell）に惑わされず、根本原因を特定</li>
+<li>依存関係の不足が多くのコンパイルエラーの原因</li>
+</ul>
+</li>
+<li>
+<p><strong>開発環境の再現性</strong></p>
+<ul>
+<li>依存関係を明確に定義し、セットアップ手順を文書化</li>
+<li><code>postinstall</code>スクリプトによる自動化の活用</li>
+<li><strong>既存プロジェクトでも依存関係の見直しが必要な場合がある</strong></li>
+</ul>
+</li>
+</ol>
+<h2 id="プロジェクト構成の確認">プロジェクト構成の確認</h2>
+<p>現在のルートpackage.jsonの重要な設定：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;main&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./client/out/extension&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;compile&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc -b client/tsconfig.json server/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;watch&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc -b -w client/tsconfig.json server/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;postinstall&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;cd client &amp;&amp; npm install &amp;&amp; cd ../server &amp;&amp; npm install &amp;&amp; cd ..&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>この設定により、クライアント・サーバー構造が正しく管理されている。</p>
+<h2 id="結論">結論</h2>
+<p>今回の問題は、<strong>プロジェクトファイルは存在していたが、依存関係の定義が不完全</strong>だったことが根本原因でした。VS Code拡張機能開発では、単純なファイル存在確認だけでなく、依存関係の内容確認が重要であることが判明しました。</p>
+
+            
+            
+        </body>
+        </html>
