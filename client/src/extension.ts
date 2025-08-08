@@ -108,8 +108,22 @@ export function activate(context: ExtensionContext) {
 
 		}
 
-		void client.sendRequest(openCSVRequest, csvFilePath);
+		// クライアントの初期化状態をチェック
+		if (!client) {
+			void window.showErrorMessage('Language client is not initialized');
+			return;
+		}
 
+		// リクエスト送信前にログ出力
+		console.log('Sending CSV request:', csvFilePath);
+		
+		try {
+			await client.sendRequest(openCSVRequest, csvFilePath);
+			console.log('CSV request sent successfully');
+		} catch (error) {
+			console.error('Failed to send CSV request:', error);
+			void window.showErrorMessage('Failed to send CSV request');
+		}
 	});
 	context.subscriptions.push(disposable);
 

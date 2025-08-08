@@ -147,9 +147,20 @@ const openCSV: RequestHandler<string, void, void> = async (csvFilePath) => {
 		*/
 
 		for (const record of records) {
+			// デバッグ用ログ
+			connection.console.log(`Raw filename from CSV: ${record[1]}`);
+			
+			// 現在の処理
+			const currentFilename = record[1] ? record[1].substring(record[1].lastIndexOf('/') + 1) : '';
+			connection.console.log(`Extracted filename (current): ${currentFilename}`);
+			
+			// 改善された処理
+			const improvedFilename = record[1] ? path.basename(record[1]) : '';
+			connection.console.log(`Extracted filename (improved): ${improvedFilename}`);
+    
 			const issue: Issue = {
 				cid: record[0],
-				filename: record[1] ? record[1].substring(record[1].lastIndexOf('/') + 1) : '',
+				filename: improvedFilename,  // path.basename を使用
 				lineNumber: record[3],
 				impact: record[4],
 				type: record[6],
