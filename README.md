@@ -1,3 +1,5 @@
+![COVLint overview](./img/COVLint.jpg)
+
 # COVLint (in English)
 
 `Coverity Connect` server has a feature that highlights problematic lines in the source code. This feature has been implemented in `Visual Studio Code`. By using the `Language Server Protocol`, it also works in editors like `Atom`, `Vim`, and `Emacs` that support the language server (though this hasn't been confirmed).
@@ -12,6 +14,10 @@
   ![issue_vSC_3cids](./img/0_3_issue_VSC_3cids.jpg)
 
 `COVLint` displays the analysis results of the source code by `Coverity` in `Visual Studio Code`. The results are read from a CSV file obtained by the `cov_snap` script. `cov_snap` is a script that fetches the annotations of the source code registered on the `Coverity Connect` server.
+
+> **Dependency note**:
+> - Snapshot CSVs can be generated with the sanitized [`cov_snap_pub`](https://github.com/keides2/cov_snap_pub) toolkit. Install it (e.g., `pip install -e ../cov_snap_pub`) and run `cov_snap.py` to produce the `snapshot_id_*.csv` files consumed by COVLint.
+> - The `cov_snap` script itself imports `covautolib_3` (from the `covautolib` package). Make sure `covautolib_pub` is installed (e.g., `pip install -e ../covautolib_pub`) or `PYTHONPATH` is configured so that `covautolib_3` can be resolved.
 
 ## Procedure
 
@@ -150,6 +156,10 @@ The input box disappears when you move the focus, so "keep the input box open ev
 ### 2. CSVファイルの読み込み
 
 `cov_snap`で取得したスナップショットCSVファイルを読み込みます
+
+> **依存関係**: 
+> - スナップショット CSV は公開リポジトリの [`cov_snap_pub`](https://github.com/keides2/cov_snap_pub) に含まれる `cov_snap.py` で生成できます。`pip install -e ../cov_snap_pub` などで導入し、`cov_snap.py` を実行して `snapshot_id_*.csv` を作成後に COVLint に読み込ませてください。
+> - `cov_snap` スクリプトは `covautolib` パッケージの `covautolib_3` に依存しています。事前に `covautolib_pub` をインストール (`pip install -e ../covautolib_pub` など) するか、`PYTHONPATH` を設定して `covautolib_3` が解決できるようにしてください。
 
 - VSCodeのエクスプローラーからスナップショットを保存しているフォルダに移動し、読み込みむスナップショットを**右クリック**で選択します（左クリックでファイルの中身を表示する必要はありません）
   ![1_select_csvfile](./img/2_1_select_csvfile_2.jpg)
