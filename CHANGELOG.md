@@ -1,3 +1,8 @@
+## v0.4.1
+
+- 2026/01/25 keides2 v0.4.1 Updated README documentation.
+- 2026/01/25 keides2 v0.4.1 READMEドキュメントを更新
+
 ## v0.4.0
 
 - 2023/11/14 keides2 v0.4.0 Added indication items "local effect" and "explanation".
