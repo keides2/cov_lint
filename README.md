@@ -1,23 +1,29 @@
-![COVLint overview](./img/COVLint.jpg)
+[![COVLint overview](./img/COVLint.jpg)](./img/COVLint.jpg)
 
 # COVLint (in English)
 
 `Coverity Connect` server has a feature that highlights problematic lines in the source code. This feature has been implemented in `Visual Studio Code`. By using the `Language Server Protocol`, it also works in editors like `Atom`, `Vim`, and `Emacs` that support the language server (though this hasn't been confirmed).
 
 - Coverity Connect Source Code Screen
-  ![issue_Cov](./img/0_1_issue_Cov_2.jpg)
-
+  [![issue_Cov](./img/0_1_issue_Cov_2.jpg)](./img/0_1_issue_Cov_2.jpg)
 - COVLint Source Code Screen
-  ![issue_VSC](./img/0_2_issue_VSC_2.jpg)
-
+  [![issue_VSC](./img/0_2_issue_VSC_2.jpg)](./img/0_2_issue_VSC_2.jpg)
 - COVLint Source Code Screen (Multiple Highlights)
-  ![issue_vSC_3cids](./img/0_3_issue_VSC_3cids.jpg)
+  [![issue_vSC_3cids](./img/0_3_issue_VSC_3cids.jpg)](./img/0_3_issue_VSC_3cids.jpg)
 
-`COVLint` displays the analysis results of the source code by `Coverity` in `Visual Studio Code`. The results are read from a CSV file obtained by the `cov_snap` script. `cov_snap` is a script that fetches the annotations of the source code registered on the `Coverity Connect` server.
+`COVLint` displays the analysis results of the source code by `Coverity` in `Visual Studio Code`. The results are read from a CSV file obtained by the `CovSnap` script. `CovSnap` is a script that fetches the annotations of the source code registered on the `Coverity Connect` server.
 
-> **Dependency note**:
-> - Snapshot CSVs can be generated with the sanitized [`cov_snap_pub`](https://github.com/keides2/cov_snap_pub) toolkit. Install it (e.g., `pip install -e ../cov_snap_pub`) and run `cov_snap.py` to produce the `snapshot_id_*.csv` files consumed by COVLint.
-> - The `cov_snap` script itself imports `covautolib_3` (from the `covautolib` package). Make sure `covautolib_pub` is installed (e.g., `pip install -e ../covautolib_pub`) or `PYTHONPATH` is configured so that `covautolib_3` can be resolved.
+## 📦 About CovSnap - CSV Generation Tool
+
+**[CovSnap](https://github.com/keides2/cov_snap_pub)** (v2.1.0) is a high-performance command-line tool that fetches Coverity analysis results from Coverity Connect server and exports them as CSV files for use with COVLint.
+
+**✨ Key Features (v2.1.0):**
+- ✅ **No Outlook Required** - Direct REST API integration eliminates email dependencies
+- ⚡ **High-Speed Performance** - Retrieves 10,000+ issues in approximately 6 seconds
+- 🔧 **Easy Setup** - Simple installation from [GitHub Releases](https://github.com/keides2/cov_snap_pub/releases)
+- 📊 **CSV Export** - Generates `snapshot_id_*.csv` files compatible with COVLint
+
+**📥 Download:** Get the latest version from [CovSnap Releases](https://github.com/keides2/cov_snap_pub/releases)
 
 ## Procedure
 
@@ -26,101 +32,103 @@
 There are two ways to install `COVLint`: from a VSIX package file or from the VSCode Extension Marketplace.
 
 - Select extensions from the activity bar
-  ![activity_extension](./img/1_1_activity_extension.jpg)
+  [![activity_extension](./img/1_1_activity_extension.jpg)](./img/1_1_activity_extension.jpg)
 
 #### 1.1 Installation from VSIX Package File
 
 - From the three-dot menu, select "Install from VSIX"
-  ![install_from_vsix](./img/1_2_install_from_vsix.jpg)
-
+  [![install_from_vsix](./img/1_2_install_from_vsix.jpg)](./img/1_2_install_from_vsix.jpg)
 - Install the file `covlint-X.Y.Z.vsix`
-  ![vsix_dialog](./img/1_3_vsix_dialog.jpg)
-
+  [![vsix_dialog](./img/1_3_vsix_dialog.jpg)](./img/1_3_vsix_dialog.jpg)
 - Installation is complete
-  ![vsix_installed](./img/1_4_vsix_installed_2.jpg)
-
+  [![vsix_installed](./img/1_4_vsix_installed_2.jpg)](./img/1_4_vsix_installed_2.jpg)
 - `COVLint` Extension
-  ![covlint_extension](./img/1_5_covlint_extension_2.jpg)
+  [![covlint_extension](./img/1_5_covlint_extension_2.jpg)](./img/1_5_covlint_extension_2.jpg)
 
 #### 1.2 Installation from VSCode Extension Marketplace
 
 - Enter `covlint` in the search box and click "Install"
-  ![1_6_install_from_extension](./img/1_6_install_from_extension_2.jpg)
-
+  [![1_6_install_from_extension](./img/1_6_install_from_extension_2.jpg)](./img/1_6_install_from_extension_2.jpg)
 - Installation is complete
-  ![1_7_install_completed](./img/1_7_install_completed.jpg)
+  [![1_7_install_completed](./img/1_7_install_completed.jpg)](./img/1_7_install_completed.jpg)
 
 ### 2. Loading the CSV File
 
-Load the snapshot CSV file obtained with `cov_snap`.
+Load the snapshot CSV file obtained with `CovSnap`.
+For more information, see [cov_snap_pub](https://github.com/keides2/cov_snap_pub).
 
 - Move to the folder where the snapshot is saved from VSCode's explorer and **right-click** to select the snapshot (you don't need to display the contents of the file with a left click)
-  ![1_select_csvfile](./img/2_1_select_csvfile_2.jpg)
-
+  [![1_select_csvfile](./img/2_1_select_csvfile_2.jpg)](./img/2_1_select_csvfile_2.jpg)
 - From the menu, select "Copy Path"
-  ![2_copy_path](./img/2_2_copy_path_2.jpg)
-
+  [![2_copy_path](./img/2_2_copy_path_2.jpg)](./img/2_2_copy_path_2.jpg)
 - Press `Ctrl` + `Shift` + `p` to open the command palette and select `COVLint: open CSV file`
-  ![3_command_palette](./img/2_3_command_palette_2.jpg)
-
+  [![3_command_palette](./img/2_3_command_palette_2.jpg)](./img/2_3_command_palette_2.jpg)
 - Paste the path of the copied snapshot CSV file into the input box
-  ![4_input_csvfilepath](./img/2_4_input_csvfilepath_2.jpg)
-
+  [![4_input_csvfilepath](./img/2_4_input_csvfilepath_2.jpg)](./img/2_4_input_csvfilepath_2.jpg)
 - Message when no input is made
-  ![no_csvfile](./img/2_5_no_csvfile.jpg)
-
+  [![no_csvfile](./img/2_5_no_csvfile.jpg)](./img/2_5_no_csvfile.jpg)
 - Message when loading is successful
-  ![5_file_opened](./img/2_6_file_opened.jpg)
-
+  [![5_file_opened](./img/2_6_file_opened.jpg)](./img/2_6_file_opened.jpg)
 - If loading fails, please retry
-  ![file_doesnt_exist](./img/2_7_file_doesnt_exist.jpg)
+  [![file_doesnt_exist](./img/2_7_file_doesnt_exist.jpg)](./img/2_7_file_doesnt_exist.jpg)
 
 ### 3. Displaying Annotations
 
 - Move the folder and select the source code you are developing
-  ![6_targetfile_open](./img/3_1_targetfile_open_2.jpg)
-
+  [![6_targetfile_open](./img/3_1_targetfile_open_2.jpg)](./img/3_1_targetfile_open_2.jpg)
 - Lines with issues in the source code are underlined, so hover over them
   - Annotations will be displayed in a popup
   - A list of annotations will be displayed in the problem panel
   - Clicking on an issue will jump to the corresponding line
-  ![7_hover](./img/3_2_hover_2.jpg)
+    [![7_hover](./img/3_2_hover_2.jpg)](./img/3_2_hover_2.jpg)
 
 ## Notes
 
-This was based on Microsoft's `https://github.com/Microsoft/vscode-extension-samples` `lsp-sample` and an article by [@Ikuyadeu](https://qiita.com/Ikuyadeu) titled [Language Server Protocol Development Tutorial](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff). 
+This was based on Microsoft's `https://github.com/Microsoft/vscode-extension-samples` `lsp-sample` and an article by [@Ikuyadeu](https://qiita.com/Ikuyadeu) titled [Language Server Protocol Development Tutorial](https://qiita.com/Ikuyadeu/items/98458f9ab760d09660ff).
 
 ---
 
-- 2023/09/15 keides2 v0.0.1 First edition
-- 2023/09/16 keides2 v0.0.2 Image replacement
-- 2023/09/17 keides2 v0.0.3 Extension Marketplace support
-- 2023/09/20 keides2 v0.1.0 webpack
-- 2023/10/07 keides2 V0.2.0 Removed the uppercase character detection function for 3 or more characters.
-- 2023/10/10 keides2 v0.3.0 The color of the wavy line, the level of the diagnosis result, and the icon change depending on the impact level: "high," "medium," and "low."
-- 2023/10/13 keides2 v0.3.1 Added constraints when reading CSV files (files whose format is not snapshot_id_xxxx.csv will not be read).
-- 2023/10/18 keides2 v0.3.2 Outputs an error when the return value type of the input box is undefined. (does not display an error dialog)
-The input box disappears when you move the focus, so "keep the input box open even if the focus moves to another part of the editor or to another window" (a usability improvement)
-- 2023/11/06 keides2 v0.3.3 Supports cases where CSV file values include commas.
+- 2025/01/26 keides2 v0.4.1 Updated README to highlight CovSnap v2.1.0 with REST API support, Outlook-free operation, and high-speed performance (10,000+ issues in ~6 seconds)
 - 2023/11/14 keides2 v0.4.0 Added indication items "local effect" and "explanation".
+- 2023/11/06 keides2 v0.3.3 Supports cases where CSV file values include commas.
+- 2023/10/18 keides2 v0.3.2 Outputs an error when the return value type of the input box is undefined. (does not display an error dialog)
+  The input box disappears when you move the focus, so "keep the input box open even if the focus moves to another part of the editor or to another window" (a usability improvement)
+- 2023/10/13 keides2 v0.3.1 Added constraints when reading CSV files (files whose format is not snapshot_id_xxxx.csv will not be read).
+- 2023/10/10 keides2 v0.3.0 The color of the wavy line, the level of the diagnosis result, and the icon change depending on the impact level: "high," "medium," and "low."
+- 2023/10/07 keides2 V0.2.0 Removed the uppercase character detection function for 3 or more characters.
+- 2023/09/20 keides2 v0.1.0 webpack
+- 2023/09/17 keides2 v0.0.3 Extension Marketplace support
+- 2023/09/16 keides2 v0.0.2 Image replacement
+- 2023/09/15 keides2 v0.0.1 First edition
 
 ---
+
 # COVLint (in Japanese)
 
 `Coverity Connect`サーバーの特長の一つである問題のある行に指摘が付いたソースコード画面を`Visual Studio Code`上に実現しました。`Language Server Protocol`（言語サーバー）を利用していますので、言語サーバーの機能がある`Atom`、`Vim`や`Emacs`などのエディターで動作します（と言われていますが未確認です）。
 
 - Coverity Connect ソースコード画面
-  ![issue_Cov](./img/0_1_issue_Cov_2.jpg)
-
+  [![issue_Cov](./img/0_1_issue_Cov_2.jpg)](./img/0_1_issue_Cov_2.jpg)
 - COVLint ソースコード画面
-  ![issue_VSC](./img/0_2_issue_VSC_2.jpg)
-
+  [![issue_VSC](./img/0_2_issue_VSC_2.jpg)](./img/0_2_issue_VSC_2.jpg)
 - COVLint ソースコード画面（指摘を複数表示）
-  ![issue_vSC_3cids](./img/0_3_issue_VSC_3cids.jpg)
+  [![issue_vSC_3cids](./img/0_3_issue_VSC_3cids.jpg)](./img/0_3_issue_VSC_3cids.jpg)
 
 `COVLint`は、`Coverity`が解析したソースコードの指摘結果を `Visual Studio Code` に表示します。
-指摘結果は、スクリプト`cov_snap`が取得したCSVファイルから読み込みます。
-`cov_snap`は、`Coverity Connect` サーバーに登録されているソースコードの指摘内容を取得するスクリプトです。
+指摘結果は、スクリプト`CovSnap`が取得したCSVファイルから読み込みます。
+`CovSnap`は、`Coverity Connect` サーバーに登録されているソースコードの指摘内容を取得するスクリプトです。
+
+## 📦 CovSnapについて - CSV生成ツール
+
+**[CovSnap](https://github.com/keides2/cov_snap_pub)** (v2.1.0)は、Coverity Connectサーバーから解析結果を取得し、COVLintで使用できるCSVファイルとしてエクスポートする高性能なコマンドラインツールです。
+
+**✨ 主な機能（v2.1.0）：**
+- ✅ **Outlook不要** - REST APIによる直接連携でメール依存を排除
+- ⚡ **高速処理** - 1万件超の指摘を約6秒で取得可能
+- 🔧 **簡単セットアップ** - [GitHubリリース](https://github.com/keides2/cov_snap_pub/releases)から簡単インストール
+- 📊 **CSV出力** - COVLint対応の`snapshot_id_*.csv`ファイルを生成
+
+**📥 ダウンロード：** 最新版は[CovSnapリリースページ](https://github.com/keides2/cov_snap_pub/releases)から入手できます
 
 ## 実施手順
 
@@ -129,70 +137,55 @@ The input box disappears when you move the focus, so "keep the input box open ev
 `COVLint`は、VSIXパッケージファイルからインストールする方法と、VSCode拡張機能マーケットプレースからインストールする方法があります。
 
 - アクティビティーバーから拡張機能を選択します
-  ![activity_extension](./img/1_1_activity_extension.jpg)
+  [![activity_extension](./img/1_1_activity_extension.jpg)](./img/1_1_activity_extension.jpg)
 
 #### 1.1 VSIXパッケージファイルからのインストール
 
 - 3点メニューから「VSIXからインストール」を選択します
-  ![install_from_vsix](./img/1_2_install_from_vsix.jpg)
-
+  [![install_from_vsix](./img/1_2_install_from_vsix.jpg)](./img/1_2_install_from_vsix.jpg)
 - ファイル「covlint-X.Y.Z.vsix」をインストールします
-  ![vsix_dialog](./img/1_3_vsix_dialog.jpg)
-
+  [![vsix_dialog](./img/1_3_vsix_dialog.jpg)](./img/1_3_vsix_dialog.jpg)
 - インストール完了です
-  ![vsix_installed](./img/1_4_vsix_installed_2.jpg)
-
+  [![vsix_installed](./img/1_4_vsix_installed_2.jpg)](./img/1_4_vsix_installed_2.jpg)
 - 拡張機能 `COVLint`
-  ![covlint_extension](./img/1_5_covlint_extension_2.jpg)
+  [![covlint_extension](./img/1_5_covlint_extension_2.jpg)](./img/1_5_covlint_extension_2.jpg)
 
 #### 1.2 VSCode拡張機能マーケットプレースからのインストール
 
 - 検索窓に`covlint`を入力し、「インストール」を押下げます
-  ![1_6_install_from_extension](./img/1_6_install_from_extension_2.jpg)
-
+  [![1_6_install_from_extension](./img/1_6_install_from_extension_2.jpg)](./img/1_6_install_from_extension_2.jpg)
 - インストール完了です
-  ![1_7_install_completed](./img/1_7_install_completed.jpg)
+  [![1_7_install_completed](./img/1_7_install_completed.jpg)](./img/1_7_install_completed.jpg)
 
 ### 2. CSVファイルの読み込み
 
-`cov_snap`で取得したスナップショットCSVファイルを読み込みます
-
-> **依存関係**: 
-> - スナップショット CSV は公開リポジトリの [`cov_snap_pub`](https://github.com/keides2/cov_snap_pub) に含まれる `cov_snap.py` で生成できます。`pip install -e ../cov_snap_pub` などで導入し、`cov_snap.py` を実行して `snapshot_id_*.csv` を作成後に COVLint に読み込ませてください。
-> - `cov_snap` スクリプトは `covautolib` パッケージの `covautolib_3` に依存しています。事前に `covautolib_pub` をインストール (`pip install -e ../covautolib_pub` など) するか、`PYTHONPATH` を設定して `covautolib_3` が解決できるようにしてください。
+`CovSnap`で取得したスナップショットCSVファイルを読み込みます。
+詳細は、[cov_snap_pub](https://github.com/keides2/cov_snap_pub)を参照してください。
 
 - VSCodeのエクスプローラーからスナップショットを保存しているフォルダに移動し、読み込みむスナップショットを**右クリック**で選択します（左クリックでファイルの中身を表示する必要はありません）
-  ![1_select_csvfile](./img/2_1_select_csvfile_2.jpg)
-
+  [![1_select_csvfile](./img/2_1_select_csvfile_2.jpg)](./img/2_1_select_csvfile_2.jpg)
 - メニューから「パスのコピー」を選択します
-  ![2_copy_path](./img/2_2_copy_path_2.jpg)
-
+  [![2_copy_path](./img/2_2_copy_path_2.jpg)](./img/2_2_copy_path_2.jpg)
 - `Ctrl` + `Shift` + `p`を押してコマンドパレットを開き、`COVLint: open CSV file`を選択します
-  ![3_command_palette](./img/2_3_command_palette_2.jpg)
-
+  [![3_command_palette](./img/2_3_command_palette_2.jpg)](./img/2_3_command_palette_2.jpg)
 - 入力ボックスにコピーしたスナップショットCSVファイルのパスを貼り付けます
-  ![4_input_csvfilepath](./img/2_4_input_csvfilepath_2.jpg)
-
+  [![4_input_csvfilepath](./img/2_4_input_csvfilepath_2.jpg)](./img/2_4_input_csvfilepath_2.jpg)
 - 何も入力しなかったときのメッセージです
-  ![no_csvfile](./img/2_5_no_csvfile.jpg)
-
+  [![no_csvfile](./img/2_5_no_csvfile.jpg)](./img/2_5_no_csvfile.jpg)
 - 読み込みに成功したときのメッセージです
-  ![5_file_opened](./img/2_6_file_opened.jpg)
-
+  [![5_file_opened](./img/2_6_file_opened.jpg)](./img/2_6_file_opened.jpg)
 - 読み込みに失敗したときはリトライしてください
-  ![file_doesnt_exist](./img/2_7_file_doesnt_exist.jpg)
-
+  [![file_doesnt_exist](./img/2_7_file_doesnt_exist.jpg)](./img/2_7_file_doesnt_exist.jpg)
 
 ### 3. 指摘の表示
 
 - フォルダを移動して開発中のソースコードを選択します
-  ![6_targetfile_open](./img/3_1_targetfile_open_2.jpg)
-
+  [![6_targetfile_open](./img/3_1_targetfile_open_2.jpg)](./img/3_1_targetfile_open_2.jpg)
 - ソースコードの問題のある行に波線が入っているのでマウスオーバーします
   - 指摘がポップアップ表示されます
   - 問題パネルに指摘の一覧が表示されます
   - 問題を左クリックすると該当行にジャンプします
-  ![7_hover](./img/3_2_hover_2.jpg)
+    [![7_hover](./img/3_2_hover_2.jpg)](./img/3_2_hover_2.jpg)
 
 ## 備考
 
@@ -200,14 +193,15 @@ Microsoftの`https://github.com/Microsoft/vscode-extension-samples`にある`lsp
 
 ---
 
-- 2023/09/15 keides2 v0.0.1 初版
-- 2023/09/16 keides2 v0.0.2 図の差し替え
-- 2023/09/17 keides2 v0.0.3 拡張機能マーケットプレース対応
-- 2023/09/20 keides2 v0.1.0 webpack 対応。英文追加
-- 2023/10/07 keides2 v0.2.0 ３文字以上の大文字検出をやめる
-- 2023/10/10 keides2 v0.3.0 影響度「高」、「中」、「低」に対応し、波線の色と診断結果のレベルとアイコンを変える
-- 2023/10/13 keides2 v0.3.1 CSVファイル読み込み時の制約を追加（書式が snapshot_id_xxxx.csv でないファイルを読み込まない）
-- 2023/10/18 keides2 v0.3.2 入力ボックスの戻り値の型が、 undefined の時にエラーを出力する（エラーダイアログは出さない）
-フォーカスを移動すると入力ボックスが消えてしまうので、「フォーカスがエディタの他の部分や他のウィンドウに移動しても、入力ボックスを開いたままにする」（ユーザビリティ向上）
-- 2023/11/06 keides2 v0.3.3 CSVファイルの値がコンマを含む場合に対応
+- 2025/01/26 keides2 v0.4.1 CovSnap v2.1.0（REST API対応・Outlook不要・高速化：1万件超を約6秒で取得）の情報をREADMEに追加
 - 2023/11/14 keides2 v0.4.0 指摘項目「ローカル効果」と「説明」を追加表示
+- 2023/11/06 keides2 v0.3.3 CSVファイルの値がコンマを含む場合に対応
+- 2023/10/18 keides2 v0.3.2 入力ボックスの戻り値の型が、 undefined の時にエラーを出力する（エラーダイアログは出さない）
+  フォーカスを移動すると入力ボックスが消えてしまうので、「フォーカスがエディタの他の部分や他のウィンドウに移動しても、入力ボックスを開いたままにする」（ユーザビリティ向上）
+- 2023/10/13 keides2 v0.3.1 CSVファイル読み込み時の制約を追加（書式が snapshot_id_xxxx.csv でないファイルを読み込まない）
+- 2023/10/10 keides2 v0.3.0 影響度「高」、「中」、「低」に対応し、波線の色と診断結果のレベルとアイコンを変える
+- 2023/10/07 keides2 v0.2.0 ３文字以上の大文字検出をやめる
+- 2023/09/20 keides2 v0.1.0 webpack 対応。英文追加
+- 2023/09/17 keides2 v0.0.3 拡張機能マーケットプレース対応
+- 2023/09/16 keides2 v0.0.2 図の差し替え
+- 2023/09/15 keides2 v0.0.1 初版
