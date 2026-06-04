@@ -1,3 +1,8 @@
+## v0.4.2
+
+- 2026/06/04 keides2 v0.4.2 Fixed VSIX packaging so `server/out/server.js` is included in the extension package.
+- 2026/06/04 keides2 v0.4.2 VSIX パッケージに `server/out/server.js` が含まれるように修正。
+
 ## v0.4.1
 
 - 2026/01/25 keides2 v0.4.1 Updated README documentation.
