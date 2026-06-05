@@ -1,3 +1,10 @@
+## v0.4.3
+
+- 2026/06/05 keides2 v0.4.3 Added explicit command activation for `covlint.activate`.
+- 2026/06/05 keides2 v0.4.3 Ensured VSIX prepublish runs webpack before packaging and added a VSIX package validation script.
+- 2026/06/05 keides2 v0.4.3 `covlint.activate` のコマンド実行時に拡張機能が確実に有効化されるように修正。
+- 2026/06/05 keides2 v0.4.3 VSIX 作成前に webpack を必ず実行し、VSIX 内容検査スクリプトを追加。
+
 ## v0.4.2
 
 - 2026/06/04 keides2 v0.4.2 Fixed VSIX packaging so `server/out/server.js` is included in the extension package.

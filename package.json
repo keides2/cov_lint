@@ -5,7 +5,7 @@
   "author": "keides2",
   "publisher": "keides2",
   "license": "MIT",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keides2/cov_lint.git"
@@ -27,6 +27,7 @@
     "vscode": "^1.75.0"
   },
   "activationEvents": [
+    "onCommand:covlint.activate",
     "onLanguage:plaintext"
   ],
   "main": "./client/out/extension",
@@ -62,8 +63,10 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run compile && npm run webpack",
     "compile": "tsc -b client/tsconfig.json server/tsconfig.json",
+    "webpack": "webpack --config client/webpack.config.js --config server/webpack.config.js",
+    "check:vsix": "node scripts/check-vsix.js",
     "watch": "tsc -b -w client/tsconfig.json server/tsconfig.json",
     "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",

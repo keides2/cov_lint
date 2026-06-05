@@ -1,6 +1,7 @@
 # Language server output
 
 *.vsix
+*.html
 node_modules
 client/out
 client/node_modules
